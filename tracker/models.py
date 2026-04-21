@@ -200,6 +200,7 @@ class PersonalRecord(models.Model):
             return float(estimate.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP))
         return None
 
+
 class WorkoutTemplate(models.Model):
     """A saved workout structure that can be reused."""
     user       = models.ForeignKey(User, on_delete=models.CASCADE, related_name='workout_templates')
