@@ -1,0 +1,7 @@
+"""WSGI config for FitTrack — used by Heroku (gunicorn) and local runserver."""
+
+import os
+from django.core.wsgi import get_wsgi_application
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'fittrack.settings')
+application = get_wsgi_application()
