@@ -67,6 +67,7 @@ class WorkoutQuerySet(models.QuerySet):
 
         return streak
     
+
 class WorkoutManager(models.Manager):
     def get_queryset(self):
         return WorkoutQuerySet(self.model, using=self._db)
@@ -198,4 +199,30 @@ class PersonalRecord(models.Model):
             estimate = self.best_weight * multiplier
             return float(estimate.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP))
         return None
-    
+
+class WorkoutTemplate(models.Model):
+    """A saved workout structure that can be reused."""
+    user       = models.ForeignKey(User, on_delete=models.CASCADE, related_name='workout_templates')
+    name       = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return f"{self.name} (template)"
+
+
+class WorkoutTemplateItem(models.Model):
+    """One exercise line within a WorkoutTemplate."""
+    template = models.ForeignKey(WorkoutTemplate, on_delete=models.CASCADE, related_name='items')
+    exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
+    sets     = models.PositiveIntegerField(default=3, validators=[MinValueValidator(1)])
+    reps     = models.PositiveIntegerField(default=10, validators=[MinValueValidator(1)])
+    notes    = models.CharField(max_length=200, blank=True)
+
+    class Meta:
+        order_with_respect_to = 'template'
+
+    def __str__(self):
+        return f"{self.template.name} — {self.exercise.name}"
