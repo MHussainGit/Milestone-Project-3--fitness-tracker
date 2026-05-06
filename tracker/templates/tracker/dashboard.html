@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="hero">
+    <div class="hero__label">Welcome back</div>
+    <h1 class="hero__title">{{ user.username }}</h1>
+    <div class="hero__meta">Current month: {{ current_month }}</div>
+    {% if streak > 0 %}
+      <div class="streak-badge" aria-label="{{ streak }} day streak">
+        <span aria-hidden="true">🔥</span> {{ streak }}-day streak
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-card__value">{{ total_entries }}</div>
+      <div class="stat-card__label">Exercises Logged</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__value">{{ monthly_sets }}</div>
+      <div class="stat-card__label">Sets Logged</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__value">{{ monthly_workouts }}</div>
+      <div class="stat-card__label">Workouts This Month</div>
+    </div>
+    {% if latest_bw %}
+    <div class="stat-card">
+      <div class="stat-card__value">{{ latest_bw.weight }}</div>
+      <div class="stat-card__label">Bodyweight (kg)</div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Quick actions -->
+  <div class="quick-actions">
+    <a href="{% url 'workout_create' %}" class="quick-action-btn" title="Log a new workout" aria-label="Log a new workout">
+      <span aria-hidden="true">🏋️</span> Log Workout
+    </a>
+    <a href="{% url 'bodyweight_list' %}" class="quick-action-btn" title="Log your body weight" aria-label="Log your body weight">
+      <span aria-hidden="true">⚖️</span> Log Weight
+    </a>
+    <a href="{% url 'notes_list' %}" class="quick-action-btn" title="Add a daily note" aria-label="Add a daily note">
+      <span aria-hidden="true">📝</span> Add Note
+    </a>
+    <a href="{% url 'progress' %}" class="quick-action-btn" title="View your progress" aria-label="View your progress">
+      <span aria-hidden="true">📈</span> Progress
+    </a>
+  </div>
+
+  <div class="dashboard-grid">
+    <!-- Recent workouts -->
+    <div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 class="section-head" style="margin: 0;">Recent Workouts</h2>
+        <a href="{% url 'workout_list' %}" class="btn btn-secondary btn-sm">View all</a>
+      </div>
+      {% if recent_workouts %}
+        <div class="workout-grid">
+          {% for workout in recent_workouts %}
+            <a href="{% url 'workout_detail' workout.pk %}" class="workout-item" style="text-decoration:none;color:inherit">
+              <div>
+                <div class="workout-item__name">{{ workout.name }}</div>
+                <div class="workout-item__date">{{ workout.date|date:"D, j M Y" }}</div>
+                <div class="workout-item__badges">
+                  <span class="badge badge-accent">{{ workout.entry_count }} exercise{{ workout.entry_count|pluralize }}</span>
+                  {% if workout.total_volume > 0 %}
+                    <span class="badge">{{ workout.total_volume|floatformat:0 }} kg</span>
+                  {% endif %}
+                </div>
+              </div>
+              <span class="btn btn-info btn-sm">View</span>
+            </a>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-state__icon" aria-hidden="true">🏋️</div>
+          <p>No workouts yet.</p>
+          <a href="{% url 'workout_create' %}" class="btn btn-primary">Log Workout</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- PRs + Today's note -->
+    <div>
+      {% if top_prs %}
+      <h2 class="section-head" style="margin-top:0">Personal Records <span aria-hidden="true">🏆</span></h2>
+      <div class="card" style="padding:0;overflow:hidden;margin-bottom:1.5rem">
+        <div class="table-scroll">
+          <table class="ex-table" aria-label="Your personal records">
+            <thead><tr><th scope="col">Exercise</th><th scope="col">Weight</th><th scope="col">Reps</th><th scope="col">Date</th></tr></thead>
+          <tbody>
+            {% for pr in top_prs %}
+            <tr>
+              <td><strong>{{ pr.exercise.name }}</strong></td>
+              <td style="color:var(--accent)">{{ pr.best_weight }} kg</td>
+              <td>{{ pr.best_reps }}</td>
+              <td style="color:var(--muted);font-size:.8rem">{{ pr.achieved_date|date:"j M Y" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+
+      <h2 class="section-head">Today's Note</h2>
+      {% if todays_note %}
+        <div class="card card-accent">
+          <div style="font-size:1.4rem;margin-bottom:.4rem">
+            {% if todays_note.mood == 'great' %}💪{% elif todays_note.mood == 'good' %}😊{% elif todays_note.mood == 'ok' %}😐{% elif todays_note.mood == 'tired' %}😴{% elif todays_note.mood == 'bad' %}😞{% endif %}
+            {{ todays_note.get_mood_display }}
+          </div>
+          <p style="color:var(--muted)">{{ todays_note.content }}</p>
+          <a href="{% url 'notes_list' %}" class="btn btn-secondary btn-sm" style="margin-top:.75rem">Edit</a>
+        </div>
+      {% else %}
+        <div class="card">
+          <p style="color:var(--muted);margin-bottom:.75rem">No note for today yet.</p>
+          <a href="{% url 'notes_list' %}" class="btn btn-secondary btn-sm">Add Note</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

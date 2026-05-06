@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-box">
+    <h1>Login</h1>
+    <p class="auth-box__sub">Sign in to track your workouts.</p>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
+        {{ form.username }}
+        {% if form.username.errors %}
+          <div id="error-{{ form.username.id_for_label }}" class="invalid-feedback d-block" role="alert">
+            {{ form.username.errors.0 }}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
+        {{ form.password }}
+        {% if form.password.errors %}
+          <div id="error-{{ form.password.id_for_label }}" class="invalid-feedback d-block" role="alert">
+            {{ form.password.errors.0 }}
+          </div>
+        {% endif %}
+      </div>
+
+      {% if form.non_field_errors %}
+        <div class="form-error" role="alert">
+          {{ form.non_field_errors.0 }}
+        </div>
+      {% endif %}
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+      </div>
+    </form>
+
+    <p class="auth-box__footer">No account? <a href="{% url 'register' %}">Register here</a></p>
+  </div>
+</div>
+{% endblock %}
