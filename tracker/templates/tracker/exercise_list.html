@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Exercise Library{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <h1><em>Exercise</em> Library</h1>
+    <a href="{% url 'exercise_create' %}" class="btn btn-primary">+ Add Exercise</a>
+  </div>
+
+  <!-- Search / filter bar -->
+  <form method="get" style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.5rem;align-items:flex-end;">
+    <div class="form-group" style="margin:0;flex:1;min-width:200px">
+      <label for="search-exercises" class="form-label">Search exercises</label>
+      <input type="text" id="search-exercises" name="q" value="{{ query }}"
+             class="form-control" placeholder="Search exercises…">
+    </div>
+    <div class="form-group" style="margin:0">
+      <label for="category-filter" class="form-label">Category</label>
+      <select id="category-filter" name="category" class="form-control">
+        <option value="">All categories</option>
+        {% for value, label in categories %}
+          <option value="{{ value }}" {% if value == selected_category %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn btn-secondary">Filter</button>
+    {% if query or selected_category %}
+      <a href="{% url 'exercise_list' %}" class="btn btn-secondary">Clear</a>
+    {% endif %}
+  </form>
+
+  <div class="card" style="padding:0;overflow:hidden;">
+    <div class="table-scroll">
+      <table class=\"ex-table\" aria-label=\"Exercise library\">
+        <thead>
+          <tr>
+            <th scope=\"col\">Name</th>
+            <th scope=\"col\">Category</th>
+            <th scope=\"col\">Muscle Group</th>
+            <th scope=\"col\">Actions</th>
+          </tr>
+        </thead>
+      <tbody>
+        {% for exercise in exercises %}
+          <tr>
+            <td>
+              <strong>{{ exercise.name }}</strong>
+              {% if exercise.description %}
+                <br><small style="color:var(--muted)">{{ exercise.description }}</small>
+              {% endif %}
+            </td>
+            <td><span class="badge badge-{{ exercise.category }}">{{ exercise.category }}</span></td>
+            <td>{{ exercise.muscle_group|default:"—" }}</td>
+            <td>
+              <div class="actions-cell">
+                <a href="{% url 'exercise_edit' exercise.pk %}" class="btn btn-secondary btn-sm" aria-label="Edit exercise {{ exercise.name }}">Edit</a>
+                <a href="{% url 'exercise_delete' exercise.pk %}" class="btn btn-danger btn-sm" aria-label="Delete exercise {{ exercise.name }}">Delete</a>
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="4" style="text-align:center;color:var(--muted);padding:2rem">
+              No exercises found.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
