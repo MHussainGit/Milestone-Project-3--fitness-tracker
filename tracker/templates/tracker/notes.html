@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Daily Notes{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-header"><h1><em>Daily</em> Notes</h1></div>
+  <div class="two-col-layout">
+    <div class="form-card">
+      <h3 style="font-family:var(--font-d);font-size:1.4rem;margin-bottom:1rem">Add / Update Note</h3>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="form-group">
+            <label>{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<p class="form-error">{{ field.errors.0 }}</p>{% endif %}
+          </div>
+        {% endfor %}
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Save Note</button>
+        </div>
+      </form>
+    </div>
+    <div>
+      {% if notes %}
+        <div class="notes-list">
+          {% for note in notes %}
+          <div class="card card-accent" style="margin-bottom:.75rem">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem">
+              <span style="font-family:var(--font-d);font-size:1.1rem">{{ note.date|date:"D, j M Y" }}</span>
+              <div style="display:flex;gap:.4rem;align-items:center">
+                {% if note.mood %}
+                  <span class="badge">
+                    {% if note.mood == 'great' %}💪{% elif note.mood == 'good' %}😊{% elif note.mood == 'ok' %}😐{% elif note.mood == 'tired' %}😴{% else %}😞{% endif %}
+                    {{ note.get_mood_display }}
+                  </span>
+                {% endif %}
+                <a href="{% url 'note_delete' note.pk %}" class="btn btn-danger btn-sm">✕</a>
+              </div>
+            </div>
+            <p style="color:var(--muted)">{{ note.content }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state"><div class="empty-state__icon">📝</div><p>No notes yet.</p></div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

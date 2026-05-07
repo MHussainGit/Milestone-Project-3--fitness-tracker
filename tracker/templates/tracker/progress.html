@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+{% block title %}Progress{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <h1><em>Progress</em> Charts</h1>
+    <a href="{% url 'workout_export' %}" class="btn btn-secondary">⬇ Export CSV</a>
+  </div>
+
+  <div class="progress-grid">
+    <!-- Workout Frequency chart -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <h3 id="freq-chart-title" class="chart-title" style="margin:0">Workout Frequency Trend</h3>
+        <div class="form-group" style="margin:0;max-width:120px">
+          <label for="freq-view" class="sr-only">View by</label>
+          <select id="freq-view" name="freq" class="form-control" aria-labelledby="freq-chart-title" onchange="window.location.href='{% url 'progress' %}?freq=' + this.value + '{% if selected_ex_id %}&exercise={{ selected_ex_id }}{% endif %}'">
+            <option value="weekly" {% if freq_view == 'weekly' %}selected{% endif %}>Weekly</option>
+            <option value="monthly" {% if freq_view == 'monthly' %}selected{% endif %}>Monthly</option>
+          </select>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="freqChart" aria-label="Workout frequency trend" aria-describedby="freqChart-description"></canvas>
+        <div id="freqChart-description" class="sr-only">
+          This chart displays the number of workouts per {{ freq_view }} over time. The vertical axis shows the number of workouts, and the horizontal axis shows the time period.
+        </div>
+      </div>
+    </div>
+
+    <!-- Bodyweight chart -->
+    <div class="card">
+      <h3 id="bw-chart-title" class="chart-title">Bodyweight Over Time</h3>
+      {% if bw_data != '[]' %}
+        <div class="chart-wrap">
+          <canvas id="bwChart" aria-label="Bodyweight trend over time" aria-describedby="bwChart-description"></canvas>
+          <div id="bwChart-description" class="sr-only">
+            This chart displays your bodyweight measurements over time. The vertical axis shows weight in kilograms, and the horizontal axis shows the date.
+          </div>
+        </div>
+      {% else %}
+        <div class="empty-state" style="padding:2rem">
+          <p>No bodyweight entries yet.</p>
+          <a href="{% url 'bodyweight_list' %}" class="btn btn-secondary btn-sm">Log Weight</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Exercise progress -->
+  <div class="card" style="margin-top:1.5rem">
+    <h3 class="chart-title">Exercise Progress</h3>
+    <form method="get" style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.25rem;align-items:flex-end">
+      <div class="form-group" style="margin:0;flex:1;min-width:180px">
+        <label for="exercise-select" class="form-label">Select exercise</label>
+        <select id="exercise-select" name="exercise" class="form-control" onchange="this.form.submit()">
+          <option value="">— select exercise —</option>
+          {% for ex in exercises %}
+            <option value="{{ ex.pk }}" {% if ex.pk|stringformat:"s" == selected_ex_id %}selected{% endif %}>{{ ex.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </form>
+    {% if selected_exercise and ex_data != '[]' %}
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem">
+        <div class="stat-card" style="flex:1;min-width:180px;padding:1rem">
+          <div class="stat-card__value">{{ ex_latest_weight }} kg</div>
+          <div class="stat-card__label">Latest weight</div>
+        </div>
+        <div class="stat-card" style="flex:1;min-width:180px;padding:1rem">
+          <div class="stat-card__value">{{ ex_latest_sets }}</div>
+          <div class="stat-card__label">Latest sets</div>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="exChart" aria-label="Exercise progress for {{ selected_exercise.name }}" aria-describedby="exChart-description"></canvas>
+        <div id="exChart-description" class="sr-only">
+          This chart displays your progress for {{ selected_exercise.name }} over time, showing weight and reps.
+        </div>
+      </div>
+    {% elif selected_exercise %}
+      <p style="color:var(--muted)">No weighted entries found for {{ selected_exercise.name }}.</p>
+    {% else %}
+      <p style="color:var(--muted)">Select an exercise above to see your progress.</p>
+    {% endif %}
+  </div>
+
+  <!-- PR board -->
+  {% if all_prs %}
+  <h2 class="section-head" style="margin-top:2rem">Personal Records <span aria-hidden="true">🏆</span></h2>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="table-scroll">
+      <table class="ex-table" aria-label="Your personal records">
+        <thead><tr><th scope="col">Exercise</th><th scope="col">Best Weight</th><th scope="col">Reps</th><th scope="col">Est. 1RM</th><th scope="col">Date</th></tr></thead>
+        <tbody>
+          {% for pr in all_prs %}
+          <tr>
+            <td><strong>{{ pr.exercise.name }}</strong></td>
+            <td style="color:var(--accent)">{{ pr.best_weight }} kg</td>
+            <td>{{ pr.best_reps }}</td>
+            <td style="color:var(--accent)">
+              {% if pr.est_1rm %}
+                {{ pr.est_1rm }} kg
+              {% else %}—{% endif %}
+            </td>
+            <td style="color:var(--muted);font-size:.82rem">{{ pr.achieved_date|date:"j M Y" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+const chartDefaults = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: { legend: { display: false } },
+  scales: {
+    x: { ticks: { color: '#777', maxTicksLimit: 8 }, grid: { color: '#2e2e2e' } },
+    y: { ticks: { color: '#777' }, grid: { color: '#2e2e2e' } }
+  }
+};
+
+// Frequency chart (weekly or monthly)
+const freqLabels = {{ freq_labels|safe }};
+const freqData   = {{ freq_data|safe }};
+if (freqLabels.length) {
+  new Chart(document.getElementById('freqChart'), {
+    type: 'bar',
+    data: {
+      labels: freqLabels,
+      datasets: [
+        { label: 'Workouts', data: freqData, backgroundColor: 'rgba(99,179,237,0.6)', borderColor: '#63b3ed', borderWidth: 1 }
+      ]
+    },
+    options: {
+      ...chartDefaults,
+      plugins: {
+        ...chartDefaults.plugins,
+        legend: { display: true, position: 'bottom', labels: { color: '#f1f1f1' } },
+        tooltip: { callbacks: { label: ctx => ctx.parsed.y + ' workouts' } }
+      },
+      scales: {
+        ...chartDefaults.scales,
+        y: {
+          ...chartDefaults.scales.y,
+          title: { display: true, text: 'Number of Workouts', color: '#e5ff1c', font: { size: 12, weight: 'bold' } }
+        }
+      }
+    }
+  });
+}
+
+// Bodyweight chart
+const bwLabels = {{ bw_labels|safe }};
+const bwData   = {{ bw_data|safe }};
+if (bwLabels.length) {
+  new Chart(document.getElementById('bwChart'), {
+    type: 'line',
+    data: {
+      labels: bwLabels,
+      datasets: [{ data: bwData, borderColor: '#4fa3ff', backgroundColor: 'rgba(79,163,255,0.1)', tension: 0.3, fill: true, pointRadius: 4 }]
+    },
+    options: {
+      ...chartDefaults,
+      scales: {
+        ...chartDefaults.scales,
+        y: {
+          ...chartDefaults.scales.y,
+          title: { display: true, text: 'Weight (kg)', color: '#e5ff1c', font: { size: 12, weight: 'bold' } }
+        }
+      },
+      plugins: {
+        ...chartDefaults.plugins,
+        tooltip: { callbacks: { label: ctx => ctx.parsed.y + ' kg' } }
+      }
+    }
+  });
+}
+
+// Exercise progress chart
+const exLabels   = {{ ex_labels|safe }};
+const exData     = {{ ex_data|safe }};
+const exSetsData = {{ ex_sets_data|safe }};
+if (exLabels.length && document.getElementById('exChart')) {
+  new Chart(document.getElementById('exChart'), {
+    type: 'line',
+    data: {
+      labels: exLabels,
+      datasets: [
+        {
+          label: 'Weight (kg)',
+          data: exData,
+          borderColor: '#3de0a0',
+          backgroundColor: 'rgba(61,224,160,0.1)',
+          tension: 0.3,
+          fill: true,
+          pointRadius: 5,
+          yAxisID: 'y'
+        },
+        {
+          label: 'Sets',
+          data: exSetsData,
+          type: 'line',
+          borderColor: '#ffa500',
+          backgroundColor: 'rgba(255,165,0,0.2)',
+          tension: 0.3,
+          fill: false,
+          pointRadius: 4,
+          yAxisID: 'y1'
+        }
+      ]
+    },
+    options: {
+      ...chartDefaults,
+      plugins: {
+        ...chartDefaults.plugins,
+        legend: { display: true, position: 'bottom', labels: { color: '#f1f1f1' } },
+        tooltip: {
+          callbacks: {
+            label: ctx => ctx.dataset.label === 'Sets'
+              ? ctx.parsed.y + ' sets'
+              : ctx.parsed.y + ' kg'
+          }
+        }
+      },
+      scales: {
+        ...chartDefaults.scales,
+        y: {
+          ...chartDefaults.scales.y,
+          title: { display: true, text: 'Weight (kg)', color: '#e5ff1c', font: { size: 12, weight: 'bold' } }
+        },
+        y1: {
+          position: 'right',
+          grid: { drawOnChartArea: false, color: '#2e2e2e' },
+          ticks: { color: '#777' },
+          title: { display: true, text: 'Sets', color: '#ffa500', font: { size: 12, weight: 'bold' } }
+        }
+      }
+    }
+  });
+}
+</script>
+{% endblock %}
