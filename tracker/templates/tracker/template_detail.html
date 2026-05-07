@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}{{ template.name }}{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <h1><em>{{ template.name }}</em></h1>
+    <div style="display:flex;gap:.5rem">
+      <a href="{% url 'workout_create' %}?template={{ template.pk }}" class="btn btn-primary">Use Template</a>
+      <a href="{% url 'template_delete' template.pk %}" class="btn btn-danger btn-sm">Delete</a>
+    </div>
+  </div>
+
+  <div class="two-col-layout">
+    <div>
+      <div class="section-head">Exercises in Template</div>
+      {% if items %}
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="table-scroll">
+          <table class="ex-table">
+            <thead><tr><th>Exercise</th><th>Sets</th><th>Reps</th><th>Notes</th><th></th></tr></thead>
+          <tbody>
+            {% for item in items %}
+            <tr>
+              <td><strong>{{ item.exercise.name }}</strong></td>
+              <td>{{ item.sets }}</td><td>{{ item.reps }}</td>
+              <td style="color:var(--muted);font-size:.82rem">{{ item.notes|default:"—" }}</td>
+              <td><a href="{% url 'template_item_delete' template.pk item.pk %}" class="btn btn-danger btn-sm">✕</a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div class="empty-state" style="padding:2rem"><p>No exercises yet.</p></div>
+      {% endif %}
+    </div>
+    <div class="form-card">
+      <h3 style="font-family:var(--font-d);font-size:1.4rem;margin-bottom:1rem">Add Exercise</h3>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="form-group">
+            <label>{{ field.label }}</label>{{ field }}
+            {% if field.errors %}<p class="form-error">{{ field.errors.0 }}</p>{% endif %}
+          </div>
+        {% endfor %}
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Add</button>
+          <a href="{% url 'template_list' %}" class="btn btn-secondary">Back</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

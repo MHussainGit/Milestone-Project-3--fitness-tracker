@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Templates{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <h1><em>Workout</em> Templates</h1>
+    <a href="{% url 'template_create' %}" class="btn btn-primary">+ New Template</a>
+  </div>
+  {% if templates %}
+    <div class="workout-grid">
+      {% for t in templates %}
+      <div class="workout-item">
+        <div style="flex:1">
+          <div class="workout-item__name">{{ t.name }}</div>
+          <div class="workout-item__badges">
+            <span class="badge badge-accent">{{ t.items.count }} exercise{{ t.items.count|pluralize }}</span>
+          </div>
+        </div>
+        <div class="workout-item__actions">
+          <a href="{% url 'workout_create' %}?template={{ t.pk }}" class="btn btn-primary btn-sm">Use</a>
+          <a href="{% url 'template_detail' t.pk %}"               class="btn btn-secondary btn-sm">Edit</a>
+          <a href="{% url 'template_delete' t.pk %}"               class="btn btn-danger btn-sm">Delete</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-state__icon">📋</div>
+      <p>No templates yet. Save a workout structure to reuse it.</p>
+      <a href="{% url 'template_create' %}" class="btn btn-primary">Create Template</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
