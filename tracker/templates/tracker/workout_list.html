@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Workouts{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <h1><em>All</em> Workouts</h1>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+      <a href="{% url 'workout_create' %}"  class="btn btn-primary">+ Log Workout</a>
+      <a href="{% url 'template_list' %}"   class="btn btn-secondary">Templates</a>
+      <a href="{% url 'workout_export' %}"  class="btn btn-secondary">⬇ Export CSV</a>
+    </div>
+  </div>
+
+  {% if templates %}
+  <div class="section-head" style="margin-bottom:.75rem">Use a Template</div>
+  <div class="template-chips" style="margin-bottom:2rem">
+    {% for t in templates %}
+      <a href="{% url 'workout_create' %}?template={{ t.pk }}" class="chip">
+        {{ t.name }} <span class="chip__count">{{ t.items.count }}</span>
+      </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if workouts %}
+    <div class="workout-grid">
+      {% for workout in workouts %}
+        <div class="workout-item">
+          <a href="{% url 'workout_detail' workout.pk %}" style="text-decoration:none;color:inherit;flex:1;min-width:0">
+            <div class="workout-item__name">{{ workout.name }}</div>
+            <div class="workout-item__date">{{ workout.date|date:"D, j M Y" }}</div>
+            <div class="workout-item__badges">
+              <span class="badge badge-accent">{{ workout.entry_count }} exercise{{ workout.entry_count|pluralize }}</span>
+              {% if workout.total_volume > 0 %}<span class="badge">{{ workout.total_volume|floatformat:0 }} kg vol.</span>{% endif %}
+              {% if workout.notes %}<span class="badge">📝</span>{% endif %}
+            </div>
+          </a>
+          <div class="workout-item__actions">
+            <a href="{% url 'workout_detail' workout.pk %}" class="btn btn-info btn-sm">View</a>
+            <a href="{% url 'workout_edit' workout.pk %}"   class="btn btn-secondary btn-sm">Edit</a>
+            <a href="{% url 'workout_delete' workout.pk %}" class="btn btn-danger btn-sm">Delete</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-state__icon">🏋️</div>
+      <p>No workouts logged yet.</p>
+      <a href="{% url 'workout_create' %}" class="btn btn-primary">Log Your First Workout</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

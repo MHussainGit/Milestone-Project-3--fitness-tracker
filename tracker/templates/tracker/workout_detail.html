@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}{{ workout.name }}{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="workout-detail-hero">
+    <div>
+      <h1>{{ workout.name }}</h1>
+      <p class="workout-detail-hero__meta">{{ workout.date|date:"D, j M Y" }}</p>
+      {% if workout.notes %}<p class="workout-detail-hero__notes">{{ workout.notes }}</p>{% endif %}
+    </div>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+      <a href="{% url 'workout_edit' workout.pk %}"   class="btn btn-secondary btn-sm">Edit</a>
+      <a href="{% url 'workout_delete' workout.pk %}" class="btn btn-danger btn-sm">Delete</a>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-card__value">{{ entries.count }}</div>
+      <div class="stat-card__label">Exercises</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__value">{% if workout.total_volume > 0 %}{{ workout.total_volume|floatformat:0 }}{% else %}—{% endif %}</div>
+      <div class="stat-card__label">Volume (kg)</div>
+    </div>
+  </div>
+
+  <div class="section-head">
+    Exercises
+    <a href="{% url 'entry_add' workout.pk %}" class="btn btn-primary btn-sm">+ Add Exercise</a>
+  </div>
+
+  {% if entries %}
+  <div class="card" style="padding:0;overflow:hidden;">
+    <div class="table-scroll">
+      <table class="ex-table">
+        <thead><tr>
+          <th>Exercise</th><th>Type</th><th>Sets</th><th>Reps</th>
+          <th>Weight</th><th>Volume</th><th>1RM est.</th><th>Notes</th><th>Actions</th>
+        </tr></thead>
+        <tbody>
+          {% for entry in entries %}
+          <tr {% if entry.is_pr %}class="pr-row"{% endif %}>
+            <td>
+              <strong>{{ entry.exercise.name }}</strong>
+              {% if entry.is_pr %}<span class="badge badge-accent" style="margin-left:.4rem">🏆 PR</span>{% endif %}
+            </td>
+            <td><span class="badge badge-{{ entry.exercise.category }}">{{ entry.exercise.category }}</span></td>
+            <td>{{ entry.sets }}</td>
+            <td>{{ entry.reps }}</td>
+            <td>{% if entry.weight %}{{ entry.weight }} kg{% else %}<span style="color:var(--muted)">BW</span>{% endif %}</td>
+            <td>{% if entry.volume %}{{ entry.volume|floatformat:1 }} kg{% else %}—{% endif %}</td>
+            <td>{% if entry.estimated_one_rep_max %}{{ entry.estimated_one_rep_max }} kg{% else %}—{% endif %}</td>
+            <td style="color:var(--muted);font-size:.82rem">{{ entry.notes|default:"—" }}</td>
+            <td>
+              <div class="actions-cell">
+                <a href="{% url 'entry_edit' workout.pk entry.pk %}"   class="btn btn-secondary btn-sm">Edit</a>
+                <a href="{% url 'entry_delete' workout.pk entry.pk %}" class="btn btn-danger btn-sm">✕</a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <div class="empty-state" style="padding:2rem">
+    <p>No exercises added yet.</p>
+    <a href="{% url 'entry_add' workout.pk %}" class="btn btn-primary" style="margin-top:.5rem">Add Exercise</a>
+  </div>
+  {% endif %}
+
+  <div style="margin-top:1.5rem">
+    <a href="{% url 'workout_list' %}" class="btn btn-secondary">← Back to Workouts</a>
+  </div>
+</div>
+{% endblock %}
