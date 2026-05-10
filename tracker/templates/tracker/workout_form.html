@@ -24,11 +24,7 @@
               {{ field.help_text|safe }}
             </small>
           {% endif %}
-          {% if field.errors %}
-            {{ field|add_class:"is-invalid" }}
-          {% else %}
-            {{ field }}
-          {% endif %}
+          {{ field }}
           {% if field.errors %}
             <div id="error-{{ field.id_for_label }}" class="invalid-feedback d-block" role="alert">
               {{ field.errors.0 }}
