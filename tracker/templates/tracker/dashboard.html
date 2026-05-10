@@ -85,43 +85,48 @@
     </div>
 
     <!-- PRs + Today's note -->
-    <div>
+    <div class="dashboard-side">
       {% if top_prs %}
-      <h2 class="section-head" style="margin-top:0">Personal Records <span aria-hidden="true">🏆</span></h2>
-      <div class="card" style="padding:0;overflow:hidden;margin-bottom:1.5rem">
-        <div class="table-scroll">
-          <table class="ex-table" aria-label="Your personal records">
-            <thead><tr><th scope="col">Exercise</th><th scope="col">Weight</th><th scope="col">Reps</th><th scope="col">Date</th></tr></thead>
-          <tbody>
-            {% for pr in top_prs %}
-            <tr>
-              <td><strong>{{ pr.exercise.name }}</strong></td>
-              <td style="color:var(--accent)">{{ pr.best_weight }} kg</td>
-              <td>{{ pr.best_reps }}</td>
-              <td style="color:var(--muted);font-size:.8rem">{{ pr.achieved_date|date:"j M Y" }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+      <section class="dashboard-section">
+        <h2 class="section-head" style="margin-top:0">Personal Records <span aria-hidden="true">🏆</span></h2>
+        <div class="card" style="padding:0;overflow:hidden;">
+          <div class="table-scroll">
+            <table class="ex-table" aria-label="Your personal records">
+              <thead><tr><th scope="col">Exercise</th><th scope="col">Weight</th><th scope="col">Reps</th><th scope="col">Date</th></tr></thead>
+              <tbody>
+                {% for pr in top_prs %}
+                <tr>
+                  <td><strong>{{ pr.exercise.name }}</strong></td>
+                  <td style="color:var(--accent)">{{ pr.best_weight }} kg</td>
+                  <td>{{ pr.best_reps }}</td>
+                  <td style="color:var(--muted);font-size:.8rem">{{ pr.achieved_date|date:"j M Y" }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
       {% endif %}
 
-      <h2 class="section-head">Today's Note</h2>
-      {% if todays_note %}
-        <div class="card card-accent">
-          <div style="font-size:1.4rem;margin-bottom:.4rem">
-            {% if todays_note.mood == 'great' %}💪{% elif todays_note.mood == 'good' %}😊{% elif todays_note.mood == 'ok' %}😐{% elif todays_note.mood == 'tired' %}😴{% elif todays_note.mood == 'bad' %}😞{% endif %}
-            {{ todays_note.get_mood_display }}
+      <section class="dashboard-section">
+        <h2 class="section-head">Today's Note <span aria-hidden="true">📝</span></h2>
+        {% if todays_note %}
+          <div class="card card-accent">
+            <div style="font-size:1.4rem;margin-bottom:.4rem">
+              {% if todays_note.mood == 'great' %}💪{% elif todays_note.mood == 'good' %}😊{% elif todays_note.mood == 'ok' %}😐{% elif todays_note.mood == 'tired' %}😴{% elif todays_note.mood == 'bad' %}😞{% endif %}
+              {{ todays_note.get_mood_display }}
+            </div>
+            <p style="color:var(--muted)">{{ todays_note.content }}</p>
+            <a href="{% url 'notes_list' %}" class="btn btn-secondary btn-sm" style="margin-top:.75rem">Edit</a>
           </div>
-          <p style="color:var(--muted)">{{ todays_note.content }}</p>
-          <a href="{% url 'notes_list' %}" class="btn btn-secondary btn-sm" style="margin-top:.75rem">Edit</a>
-        </div>
-      {% else %}
-        <div class="card">
-          <p style="color:var(--muted);margin-bottom:.75rem">No note for today yet.</p>
-          <a href="{% url 'notes_list' %}" class="btn btn-secondary btn-sm">Add Note</a>
-        </div>
-      {% endif %}
+        {% else %}
+          <div class="card">
+            <p style="color:var(--muted);margin-bottom:.75rem">No note for today yet.</p>
+            <a href="{% url 'notes_list' %}" class="btn btn-secondary btn-sm">Add Note</a>
+          </div>
+        {% endif %}
+      </section>
     </div>
   </div>
 </div>

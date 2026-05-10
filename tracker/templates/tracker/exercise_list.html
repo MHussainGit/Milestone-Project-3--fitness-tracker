@@ -32,13 +32,13 @@
 
   <div class="card" style="padding:0;overflow:hidden;">
     <div class="table-scroll">
-      <table class=\"ex-table\" aria-label=\"Exercise library\">
+      <table class="ex-table" aria-label="Exercise library">
         <thead>
           <tr>
-            <th scope=\"col\">Name</th>
-            <th scope=\"col\">Category</th>
-            <th scope=\"col\">Muscle Group</th>
-            <th scope=\"col\">Actions</th>
+            <th scope="col">Name</th>
+            <th scope="col">Category</th>
+            <th scope="col">Muscle Group</th>
+            <th scope="col">Actions</th>
           </tr>
         </thead>
       <tbody>
@@ -47,10 +47,10 @@
             <td>
               <strong>{{ exercise.name }}</strong>
               {% if exercise.description %}
-                <br><small style="color:var(--muted)">{{ exercise.description }}</small>
+                <br><small style="color:#f1f1f1">{{ exercise.description }}</small>
               {% endif %}
             </td>
-            <td><span class="badge badge-{{ exercise.category }}">{{ exercise.category }}</span></td>
+            <td><span class="badge badge-{{ exercise.category }}" style="color:#f1f1f1">{{ exercise.category }}</span></td>
             <td>{{ exercise.muscle_group|default:"—" }}</td>
             <td>
               <div class="actions-cell">
@@ -61,7 +61,7 @@
           </tr>
         {% empty %}
           <tr>
-            <td colspan="4" style="text-align:center;color:var(--muted);padding:2rem">
+            <td colspan="4" style="text-align:center;color:#f1f1f1;padding:2rem">
               No exercises found.
             </td>
           </tr>
