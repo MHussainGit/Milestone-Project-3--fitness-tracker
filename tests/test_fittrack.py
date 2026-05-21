@@ -277,6 +277,8 @@ class WorkoutCRUDTests(TestCase):
         """POST to workout_create creates a workout and redirects to detail."""
         response = self.client.post(reverse('workout_create'), {
             'name': 'Test Workout', 'date': '2025-06-01', 'notes': '',
+            'entries-TOTAL_FORMS': '0', 'entries-INITIAL_FORMS': '0',
+            'entries-MIN_NUM_FORMS': '0', 'entries-MAX_NUM_FORMS': '1000',
         })
         self.assertEqual(Workout.objects.filter(user=self.user).count(), 1)
         workout = Workout.objects.get(user=self.user)

@@ -33,6 +33,47 @@
         </div>
       {% endfor %}
 
+      {% if formset %}
+        <h3 class="section-head" style="margin-top:1.5rem;margin-bottom:.75rem;font-size:1rem">Exercises</h3>
+        {{ formset.management_form }}
+        <div id="formset-rows">
+          {% for entry_form in formset %}
+            <div class="formset-row form-row" style="margin-bottom:.75rem;align-items:end">
+              <div class="form-group" style="margin:0;min-width:160px;flex:2">
+                <label class="form-label" style="font-size:.75rem">Exercise</label>
+                {{ entry_form.exercise }}
+                {% if entry_form.exercise.errors %}
+                  <div class="form-error">{{ entry_form.exercise.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="form-group" style="margin:0;min-width:70px">
+                <label class="form-label" style="font-size:.75rem">Sets</label>
+                {{ entry_form.sets }}
+                {% if entry_form.sets.errors %}
+                  <div class="form-error">{{ entry_form.sets.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="form-group" style="margin:0;min-width:70px">
+                <label class="form-label" style="font-size:.75rem">Reps</label>
+                {{ entry_form.reps }}
+                {% if entry_form.reps.errors %}
+                  <div class="form-error">{{ entry_form.reps.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="form-group" style="margin:0;min-width:80px">
+                <label class="form-label" style="font-size:.75rem">Weight (kg)</label>
+                {{ entry_form.weight }}
+              </div>
+              <div class="form-group" style="margin:0;flex:2;min-width:120px">
+                <label class="form-label" style="font-size:.75rem">Notes</label>
+                {{ entry_form.notes }}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        <button type="button" id="add-row" class="btn btn-secondary btn-sm" style="margin-bottom:1rem">+ Add Exercise</button>
+      {% endif %}
+
       <div class="form-actions">
         <button type="submit" class="btn btn-primary">Save</button>
         {% if workout %}
@@ -44,4 +85,27 @@
     </form>
   </div>
 </div>
+
+{% if formset %}
+<script>
+document.getElementById('add-row').addEventListener('click', function () {
+  const totalForms = document.getElementById('id_entries-TOTAL_FORMS');
+  const count = parseInt(totalForms.value, 10);
+  const container = document.getElementById('formset-rows');
+  const lastRow = container.querySelector('.formset-row:last-child');
+  const newRow = lastRow.cloneNode(true);
+  newRow.querySelectorAll('input, select, textarea').forEach(function (el) {
+    el.name = el.name.replace(/entries-\d+-/, 'entries-' + count + '-');
+    el.id   = el.id.replace(/entries_\d+_/, 'entries_' + count + '_');
+    el.value = '';
+    if (el.tagName === 'SELECT') {
+      el.selectedIndex = 0;
+    }
+  });
+  newRow.querySelectorAll('.form-error').forEach(function (el) { el.remove(); });
+  container.appendChild(newRow);
+  totalForms.value = count + 1;
+});
+</script>
+{% endif %}
 {% endblock %}

@@ -2,6 +2,7 @@
 tracker/forms.py — All Django forms for FitTrack.
 """
 from django import forms
+from django.forms import inlineformset_factory, BaseInlineFormSet
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from .models import (
@@ -63,6 +64,12 @@ class WorkoutEntryForm(StyledFormMixin, forms.ModelForm):
             'notes': forms.TextInput(attrs={'maxlength': 200, 'placeholder': 'e.g. felt strong'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['exercise'].widget = forms.Select(
+            choices=_grouped_exercise_choices(), attrs={'class': 'form-control'}
+        )
+
     def clean(self):
         cleaned = super().clean()
         sets = cleaned.get('sets')
@@ -117,6 +124,22 @@ class WorkoutTemplateForm(StyledFormMixin, forms.ModelForm):
         }
 
 
+def _grouped_exercise_choices():
+    exs = Exercise.objects.order_by('muscle_group', 'name')
+    choices = [('', '— select exercise —')]
+    current_group, group_opts = None, []
+    for ex in exs:
+        g = ex.muscle_group or ex.get_category_display()
+        if g != current_group:
+            if current_group is not None:
+                choices.append((current_group, group_opts))
+            current_group, group_opts = g, []
+        group_opts.append((ex.pk, ex.name))
+    if current_group is not None:
+        choices.append((current_group, group_opts))
+    return choices
+
+
 class WorkoutTemplateItemForm(StyledFormMixin, forms.ModelForm):
     class Meta:
         model = WorkoutTemplateItem
@@ -127,3 +150,28 @@ class WorkoutTemplateItemForm(StyledFormMixin, forms.ModelForm):
             'reps': forms.NumberInput(attrs={'min': 1}),
             'notes': forms.TextInput(attrs={'placeholder': 'Optional'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['exercise'].widget = forms.Select(
+            choices=_grouped_exercise_choices(), attrs={'class': 'form-control'}
+        )
+
+
+class _SkipEmptyRowsFormSet(BaseInlineFormSet):
+    def clean(self):
+        for form in self.forms:
+            if not form.cleaned_data.get('exercise'):
+                form.cleaned_data = {}
+        super().clean()
+
+
+WorkoutEntryFormSet = inlineformset_factory(
+    Workout,
+    WorkoutEntry,
+    form=WorkoutEntryForm,
+    formset=_SkipEmptyRowsFormSet,
+    fields=('exercise', 'sets', 'reps', 'weight', 'notes'),
+    extra=3,
+    can_delete=False,
+)

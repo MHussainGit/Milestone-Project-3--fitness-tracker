@@ -11,7 +11,7 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.utils import timezone
 from django.views.generic import CreateView, UpdateView, DeleteView
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, F, ExpressionWrapper, DecimalField
 import csv
 import json
 
@@ -22,7 +22,7 @@ from .models import (
 )
 from .forms import (
     RegisterForm, LoginForm,
-    WorkoutForm, WorkoutEntryForm, ExerciseForm,
+    WorkoutForm, WorkoutEntryForm, WorkoutEntryFormSet, ExerciseForm,
     BodyWeightForm, DailyNoteForm,
     WorkoutTemplateForm, WorkoutTemplateItemForm,
 )
@@ -188,49 +188,46 @@ def workout_list(request):
     })
 
 
-class WorkoutCreateView(LoginRequiredMixin, CreateView):
-    model = Workout
-    form_class = WorkoutForm
-    template_name = 'tracker/workout_form.html'
+@login_required
+def workout_create(request):
+    template_obj = None
+    template_id = request.GET.get('template')
+    if template_id:
+        template_obj = get_object_or_404(WorkoutTemplate, pk=template_id, user=request.user)
 
-    def dispatch(self, request, *args, **kwargs):
-        self.template = None
-        template_id = request.GET.get('template')
-        if template_id:
-            self.template = get_object_or_404(WorkoutTemplate, pk=template_id, user=request.user)
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_initial(self):
-        initial = super().get_initial()
-        initial['date'] = timezone.now().date()
-        if self.template:
-            initial['name'] = self.template.name
-        return initial
-
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        response = super().form_valid(form)
-        if self.template:
-            for item in self.template.items.all():
-                WorkoutEntry.objects.create(
-                    workout=self.object,
-                    exercise=item.exercise,
-                    sets=item.sets,
-                    reps=item.reps,
-                    notes=item.notes,
-                )
-            messages.success(self.request, f'Workout created from template "{self.template.name}"!')
+    if request.method == 'POST':
+        form = WorkoutForm(request.POST)
+        formset = WorkoutEntryFormSet(request.POST)
+        if form.is_valid() and formset.is_valid():
+            workout = form.save(commit=False)
+            workout.user = request.user
+            workout.save()
+            for entry in formset.save(commit=False):
+                entry.workout = workout
+                entry.save()
+                _update_personal_record(request.user, entry, workout)
+            if template_obj:
+                messages.success(request, f'Workout created from template "{template_obj.name}"!')
+            else:
+                messages.success(request, 'Workout created!')
+            return redirect('workout_detail', pk=workout.pk)
+    else:
+        initial = {'date': timezone.now().date()}
+        if template_obj:
+            initial['name'] = template_obj.name
+        form = WorkoutForm(initial=initial)
+        if template_obj:
+            initial_entries = [
+                {'exercise': item.exercise.pk, 'sets': item.sets, 'reps': item.reps, 'notes': item.notes}
+                for item in template_obj.items.all()
+            ]
+            formset = WorkoutEntryFormSet(initial=initial_entries)
         else:
-            messages.success(self.request, 'Workout created!')
-        return response
+            formset = WorkoutEntryFormSet()
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({'title': 'New Workout', 'template': self.template})
-        return context
-
-    def get_success_url(self):
-        return reverse('workout_detail', kwargs={'pk': self.object.pk})
+    return render(request, 'tracker/workout_form.html', {
+        'form': form, 'formset': formset, 'title': 'New Workout', 'template': template_obj,
+    })
 
 
 class WorkoutUpdateView(LoginRequiredMixin, UpdateView):
@@ -443,6 +440,9 @@ def exercise_delete(request, pk):
 
 # ── Progress Charts ────────────────────────────────────────────────────────
 
+_RANGE_DAYS = {'30': 30, '90': 90, '180': 180, '365': 365}
+
+
 @login_required
 def progress(request):
     """
@@ -450,21 +450,40 @@ def progress(request):
     - Bodyweight over time
     - Workout frequency (weekly or monthly)
     - Weight lifted for a chosen exercise over time
+    - Summary stat cards
     """
+    # Date range filter
+    range_param = request.GET.get('range', 'all')
+    days = _RANGE_DAYS.get(range_param)
+    cutoff = (timezone.now().date() - timedelta(days=days)) if days else None
+
+    # Summary stat cards
+    total_workouts = Workout.objects.filter(user=request.user).count()
+    streak = Workout.objects.streak(request.user)
+    total_volume = WorkoutEntry.objects.filter(
+        workout__user=request.user, weight__isnull=False
+    ).aggregate(
+        v=Sum(ExpressionWrapper(F('sets') * F('reps') * F('weight'), output_field=DecimalField()))
+    )['v'] or 0
+    pr_count = PersonalRecord.objects.filter(user=request.user).count()
+
     # Bodyweight chart data
-    bw_entries = BodyWeightEntry.objects.filter(user=request.user).order_by('date')
-    bw_labels  = [str(e.date) for e in bw_entries]
-    bw_data    = [float(e.weight) for e in bw_entries]
+    bw_qs = BodyWeightEntry.objects.filter(user=request.user).order_by('date')
+    if cutoff:
+        bw_qs = bw_qs.filter(date__gte=cutoff)
+    bw_labels = [str(e.date) for e in bw_qs]
+    bw_data   = [float(e.weight) for e in bw_qs]
 
     # Workout frequency chart data — weekly or monthly view
-    freq_view = request.GET.get('freq', 'weekly')  # 'weekly' or 'monthly'
+    freq_view = request.GET.get('freq', 'weekly')
     freq_labels = []
     freq_data = []
-    
+
     all_workouts = Workout.objects.filter(user=request.user).order_by('date')
-    
+    if cutoff:
+        all_workouts = all_workouts.filter(date__gte=cutoff)
+
     if freq_view == 'monthly':
-        # Group workouts by month
         month_dict = {}
         for workout in all_workouts:
             month_key = workout.date.strftime('%Y-%m')
@@ -473,7 +492,6 @@ def progress(request):
             freq_labels.append(month_key)
             freq_data.append(month_dict[month_key])
     else:
-        # Group workouts by week (ISO week number)
         week_dict = {}
         for workout in all_workouts:
             iso_year, iso_week, _ = workout.date.isocalendar()
@@ -496,25 +514,35 @@ def progress(request):
 
     if selected_ex_id:
         selected_exercise = get_object_or_404(Exercise, pk=selected_ex_id)
-        entries = WorkoutEntry.objects.filter(
+        ex_qs = WorkoutEntry.objects.filter(
             workout__user=request.user,
             exercise=selected_exercise,
             weight__isnull=False,
         ).select_related('workout').order_by('workout__date')
-        ex_labels      = [str(e.workout.date) for e in entries]
-        ex_data        = [float(e.weight) for e in entries]
-        ex_sets_data   = [e.sets for e in entries]
-        if entries:
-            last_entry = entries.last()
+        if cutoff:
+            ex_qs = ex_qs.filter(workout__date__gte=cutoff)
+        ex_labels    = [str(e.workout.date) for e in ex_qs]
+        ex_data      = [float(e.weight) for e in ex_qs]
+        ex_sets_data = [e.sets for e in ex_qs]
+        if ex_qs:
+            last_entry = ex_qs.last()
             ex_latest_weight = float(last_entry.weight)
             ex_latest_sets = last_entry.sets
 
-    # All PRs
+    # All PRs — always lifetime, not date-filtered
     all_prs = PersonalRecord.objects.filter(
         user=request.user
     ).select_related('exercise').order_by('-best_weight')
 
+    range_options = [('30d', '30'), ('90d', '90'), ('6m', '180'), ('1y', '365'), ('All', 'all')]
+
     context = {
+        'total_workouts':    total_workouts,
+        'streak':            streak,
+        'total_volume':      round(float(total_volume)),
+        'pr_count':          pr_count,
+        'range_param':       range_param,
+        'range_options':     range_options,
         'bw_labels':         json.dumps(bw_labels),
         'bw_data':           json.dumps(bw_data),
         'freq_labels':       json.dumps(freq_labels),

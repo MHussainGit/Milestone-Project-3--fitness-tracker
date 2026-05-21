@@ -4,7 +4,35 @@
 <div class="container">
   <div class="page-header">
     <h1><em>Progress</em> Charts</h1>
-    <a href="{% url 'workout_export' %}" class="btn btn-secondary">⬇ Export CSV</a>
+    <a href="{% url 'workout_export' %}" class="btn btn-secondary">&#8659; Export CSV</a>
+  </div>
+
+  <!-- Summary stat cards -->
+  <div class="stats-grid" style="margin-bottom:1.75rem">
+    <div class="stat-card">
+      <div class="stat-card__value">{{ total_workouts }}</div>
+      <div class="stat-card__label">Total Workouts</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__value">{{ streak }}</div>
+      <div class="stat-card__label">Day Streak</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__value">{{ total_volume|floatformat:"0" }}</div>
+      <div class="stat-card__label">Lifetime Volume (kg)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__value">{{ pr_count }}</div>
+      <div class="stat-card__label">Personal Records</div>
+    </div>
+  </div>
+
+  <!-- Date range filter -->
+  <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1.25rem" role="group" aria-label="Date range filter">
+    {% for label, val in range_options %}
+      <a href="{% url 'progress' %}?range={{ val }}&freq={{ freq_view }}{% if selected_ex_id %}&exercise={{ selected_ex_id }}{% endif %}"
+         class="btn btn-sm {% if range_param == val %}btn-primary{% else %}btn-secondary{% endif %}">{{ label }}</a>
+    {% endfor %}
   </div>
 
   <div class="progress-grid">
@@ -12,18 +40,20 @@
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
         <h3 id="freq-chart-title" class="chart-title" style="margin:0">Workout Frequency Trend</h3>
-        <div class="form-group" style="margin:0;max-width:120px">
+        <form method="get" style="margin:0;max-width:120px">
+          <input type="hidden" name="range" value="{{ range_param }}">
+          {% if selected_ex_id %}<input type="hidden" name="exercise" value="{{ selected_ex_id }}">{% endif %}
           <label for="freq-view" class="sr-only">View by</label>
-          <select id="freq-view" name="freq" class="form-control" aria-labelledby="freq-chart-title" onchange="window.location.href='{% url 'progress' %}?freq=' + this.value + '{% if selected_ex_id %}&exercise={{ selected_ex_id }}{% endif %}'">
+          <select id="freq-view" name="freq" class="form-control" aria-labelledby="freq-chart-title" onchange="this.form.submit()">
             <option value="weekly" {% if freq_view == 'weekly' %}selected{% endif %}>Weekly</option>
             <option value="monthly" {% if freq_view == 'monthly' %}selected{% endif %}>Monthly</option>
           </select>
-        </div>
+        </form>
       </div>
       <div class="chart-wrap">
         <canvas id="freqChart" aria-label="Workout frequency trend" aria-describedby="freqChart-description"></canvas>
         <div id="freqChart-description" class="sr-only">
-          This chart displays the number of workouts per {{ freq_view }} over time. The vertical axis shows the number of workouts, and the horizontal axis shows the time period.
+          This chart displays the number of workouts per {{ freq_view }} over time.
         </div>
       </div>
     </div>
@@ -35,7 +65,7 @@
         <div class="chart-wrap">
           <canvas id="bwChart" aria-label="Bodyweight trend over time" aria-describedby="bwChart-description"></canvas>
           <div id="bwChart-description" class="sr-only">
-            This chart displays your bodyweight measurements over time. The vertical axis shows weight in kilograms, and the horizontal axis shows the date.
+            This chart displays your bodyweight measurements over time. The dashed line shows the 7-day moving average.
           </div>
         </div>
       {% else %}
@@ -51,6 +81,8 @@
   <div class="card" style="margin-top:1.5rem">
     <h3 class="chart-title">Exercise Progress</h3>
     <form method="get" style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.25rem;align-items:flex-end">
+      <input type="hidden" name="range" value="{{ range_param }}">
+      <input type="hidden" name="freq" value="{{ freq_view }}">
       <div class="form-group" style="margin:0;flex:1;min-width:180px">
         <label for="exercise-select" class="form-label">Select exercise</label>
         <select id="exercise-select" name="exercise" class="form-control" onchange="this.form.submit()">
@@ -75,7 +107,7 @@
       <div class="chart-wrap">
         <canvas id="exChart" aria-label="Exercise progress for {{ selected_exercise.name }}" aria-describedby="exChart-description"></canvas>
         <div id="exChart-description" class="sr-only">
-          This chart displays your progress for {{ selected_exercise.name }} over time, showing weight and reps.
+          This chart displays your progress for {{ selected_exercise.name }} over time, showing weight and sets.
         </div>
       </div>
     {% elif selected_exercise %}
@@ -87,7 +119,7 @@
 
   <!-- PR board -->
   {% if all_prs %}
-  <h2 class="section-head" style="margin-top:2rem">Personal Records <span aria-hidden="true">🏆</span></h2>
+  <h2 class="section-head" style="margin-top:2rem">Personal Records</h2>
   <div class="card" style="padding:0;overflow:hidden">
     <div class="table-scroll">
       <table class="ex-table" aria-label="Your personal records">
@@ -99,9 +131,7 @@
             <td style="color:var(--accent)">{{ pr.best_weight }} kg</td>
             <td>{{ pr.best_reps }}</td>
             <td style="color:var(--accent)">
-              {% if pr.est_1rm %}
-                {{ pr.est_1rm }} kg
-              {% else %}—{% endif %}
+              {% if pr.est_1rm %}{{ pr.est_1rm }} kg{% else %}—{% endif %}
             </td>
             <td style="color:var(--muted);font-size:.82rem">{{ pr.achieved_date|date:"j M Y" }}</td>
           </tr>
@@ -125,7 +155,7 @@ const chartDefaults = {
   }
 };
 
-// Frequency chart (weekly or monthly)
+// Frequency chart
 const freqLabels = {{ freq_labels|safe }};
 const freqData   = {{ freq_data|safe }};
 if (freqLabels.length) {
@@ -133,9 +163,7 @@ if (freqLabels.length) {
     type: 'bar',
     data: {
       labels: freqLabels,
-      datasets: [
-        { label: 'Workouts', data: freqData, backgroundColor: 'rgba(99,179,237,0.6)', borderColor: '#63b3ed', borderWidth: 1 }
-      ]
+      datasets: [{ label: 'Workouts', data: freqData, backgroundColor: 'rgba(99,179,237,0.6)', borderColor: '#63b3ed', borderWidth: 1 }]
     },
     options: {
       ...chartDefaults,
@@ -146,37 +174,43 @@ if (freqLabels.length) {
       },
       scales: {
         ...chartDefaults.scales,
-        y: {
-          ...chartDefaults.scales.y,
-          title: { display: true, text: 'Number of Workouts', color: '#e5ff1c', font: { size: 12, weight: 'bold' } }
-        }
+        y: { ...chartDefaults.scales.y, title: { display: true, text: 'Number of Workouts', color: '#e5ff1c', font: { size: 12, weight: 'bold' } } }
       }
     }
   });
 }
 
-// Bodyweight chart
+// Bodyweight chart with 7-day moving average
 const bwLabels = {{ bw_labels|safe }};
 const bwData   = {{ bw_data|safe }};
 if (bwLabels.length) {
+  function movingAverage(data, win) {
+    return data.map((_, i) => {
+      if (i < win - 1) return null;
+      const slice = data.slice(i - win + 1, i + 1);
+      return Math.round(slice.reduce((a, b) => a + b, 0) / win * 10) / 10;
+    });
+  }
+  const bwMaData = movingAverage(bwData, 7);
   new Chart(document.getElementById('bwChart'), {
     type: 'line',
     data: {
       labels: bwLabels,
-      datasets: [{ data: bwData, borderColor: '#4fa3ff', backgroundColor: 'rgba(79,163,255,0.1)', tension: 0.3, fill: true, pointRadius: 4 }]
+      datasets: [
+        { label: 'Weight', data: bwData, borderColor: '#4fa3ff', backgroundColor: 'rgba(79,163,255,0.1)', tension: 0.3, fill: true, pointRadius: 4 },
+        { label: '7-day avg', data: bwMaData, borderColor: '#e5ff1c', borderDash: [4, 4], borderWidth: 2, pointRadius: 0, fill: false, tension: 0.4, spanGaps: false }
+      ]
     },
     options: {
       ...chartDefaults,
-      scales: {
-        ...chartDefaults.scales,
-        y: {
-          ...chartDefaults.scales.y,
-          title: { display: true, text: 'Weight (kg)', color: '#e5ff1c', font: { size: 12, weight: 'bold' } }
-        }
-      },
       plugins: {
         ...chartDefaults.plugins,
+        legend: { display: true, position: 'bottom', labels: { color: '#f1f1f1' } },
         tooltip: { callbacks: { label: ctx => ctx.parsed.y + ' kg' } }
+      },
+      scales: {
+        ...chartDefaults.scales,
+        y: { ...chartDefaults.scales.y, title: { display: true, text: 'Weight (kg)', color: '#e5ff1c', font: { size: 12, weight: 'bold' } } }
       }
     }
   });
@@ -192,27 +226,8 @@ if (exLabels.length && document.getElementById('exChart')) {
     data: {
       labels: exLabels,
       datasets: [
-        {
-          label: 'Weight (kg)',
-          data: exData,
-          borderColor: '#3de0a0',
-          backgroundColor: 'rgba(61,224,160,0.1)',
-          tension: 0.3,
-          fill: true,
-          pointRadius: 5,
-          yAxisID: 'y'
-        },
-        {
-          label: 'Sets',
-          data: exSetsData,
-          type: 'line',
-          borderColor: '#ffa500',
-          backgroundColor: 'rgba(255,165,0,0.2)',
-          tension: 0.3,
-          fill: false,
-          pointRadius: 4,
-          yAxisID: 'y1'
-        }
+        { label: 'Weight (kg)', data: exData, borderColor: '#3de0a0', backgroundColor: 'rgba(61,224,160,0.1)', tension: 0.3, fill: true, pointRadius: 5, yAxisID: 'y' },
+        { label: 'Sets', data: exSetsData, type: 'line', borderColor: '#ffa500', backgroundColor: 'rgba(255,165,0,0.2)', tension: 0.3, fill: false, pointRadius: 4, yAxisID: 'y1' }
       ]
     },
     options: {
@@ -220,26 +235,12 @@ if (exLabels.length && document.getElementById('exChart')) {
       plugins: {
         ...chartDefaults.plugins,
         legend: { display: true, position: 'bottom', labels: { color: '#f1f1f1' } },
-        tooltip: {
-          callbacks: {
-            label: ctx => ctx.dataset.label === 'Sets'
-              ? ctx.parsed.y + ' sets'
-              : ctx.parsed.y + ' kg'
-          }
-        }
+        tooltip: { callbacks: { label: ctx => ctx.dataset.label === 'Sets' ? ctx.parsed.y + ' sets' : ctx.parsed.y + ' kg' } }
       },
       scales: {
         ...chartDefaults.scales,
-        y: {
-          ...chartDefaults.scales.y,
-          title: { display: true, text: 'Weight (kg)', color: '#e5ff1c', font: { size: 12, weight: 'bold' } }
-        },
-        y1: {
-          position: 'right',
-          grid: { drawOnChartArea: false, color: '#2e2e2e' },
-          ticks: { color: '#777' },
-          title: { display: true, text: 'Sets', color: '#ffa500', font: { size: 12, weight: 'bold' } }
-        }
+        y: { ...chartDefaults.scales.y, title: { display: true, text: 'Weight (kg)', color: '#e5ff1c', font: { size: 12, weight: 'bold' } } },
+        y1: { position: 'right', grid: { drawOnChartArea: false, color: '#2e2e2e' }, ticks: { color: '#777' }, title: { display: true, text: 'Sets', color: '#ffa500', font: { size: 12, weight: 'bold' } } }
       }
     }
   });
