@@ -145,44 +145,93 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script>
+// ── Shared helpers ───────────────────────────────────────────────────────────
+const TICK   = { color: '#8b949e' };
+const GRID   = { color: '#21262d' };
+const LEGEND = { color: '#e6edf3' };
+
 const chartDefaults = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: { legend: { display: false } },
   scales: {
-    x: { ticks: { color: '#8b949e', maxTicksLimit: 8 }, grid: { color: '#21262d' } },
-    y: { ticks: { color: '#8b949e' }, grid: { color: '#21262d' } }
+    x: { ticks: { ...TICK, maxTicksLimit: 10 }, grid: GRID },
+    y: { ticks: TICK, grid: GRID }
   }
 };
-const axisTitle = (text) => ({ display: true, text, color: '#58a6ff', font: { size: 12, weight: 'bold' } });
-const legendLabels = { color: '#e6edf3' };
 
-// Frequency chart
-const freqLabels = {{ freq_labels|safe }};
+const axisTitle  = text => ({ display: true, text, color: '#8b949e', font: { size: 11 } });
+const yAxis      = title => ({ ...chartDefaults.scales.y, title: axisTitle(title) });
+const xAxis      = (extra = {}) => ({ ...chartDefaults.scales.x, ...extra });
+
+// Format "YYYY-MM-DD" → "17 Mar" or "17 Mar '25"
+function fmtDate(s, includeYear = false) {
+  const d = new Date(s + 'T00:00:00');
+  const opts = { day: 'numeric', month: 'short' };
+  if (includeYear) opts.year = '2-digit';
+  return d.toLocaleDateString('en-GB', opts);
+}
+
+// Format "YYYY-Www" → "17 Mar" (Monday of that ISO week)
+function fmtWeek(s) {
+  const [yearStr, wStr] = s.split('-W');
+  const year = parseInt(yearStr), week = parseInt(wStr);
+  const jan4  = new Date(year, 0, 4);
+  const w1Mon = new Date(jan4);
+  w1Mon.setDate(jan4.getDate() - ((jan4.getDay() || 7) - 1));
+  const d = new Date(w1Mon);
+  d.setDate(w1Mon.getDate() + (week - 1) * 7);
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+}
+
+// Format "YYYY-MM" → "Mar '25"
+function fmtMonth(s) {
+  const [y, m] = s.split('-');
+  return new Date(y, m - 1).toLocaleDateString('en-GB', { month: 'short', year: '2-digit' });
+}
+
+// ── 1. Workout Frequency — area chart ────────────────────────────────────────
+const freqRaw    = {{ freq_labels|safe }};
 const freqData   = {{ freq_data|safe }};
-if (freqLabels.length) {
+const freqView   = '{{ freq_view }}';
+if (freqRaw.length) {
+  const freqLabels = freqRaw.map(l => freqView === 'monthly' ? fmtMonth(l) : fmtWeek(l));
   new Chart(document.getElementById('freqChart'), {
-    type: 'bar',
+    type: 'line',
     data: {
       labels: freqLabels,
-      datasets: [{ label: 'Workouts', data: freqData, backgroundColor: 'rgba(255,166,87,0.55)', borderColor: '#ffa657', borderWidth: 1 }]
+      datasets: [{
+        label: 'Workouts',
+        data: freqData,
+        borderColor: '#ffa657',
+        backgroundColor: 'rgba(255,166,87,0.15)',
+        fill: true,
+        tension: 0.4,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+      }]
     },
     options: {
       ...chartDefaults,
       plugins: {
         ...chartDefaults.plugins,
-        legend: { display: true, position: 'bottom', labels: legendLabels },
+        legend: { display: false },
         tooltip: { callbacks: { label: ctx => ctx.parsed.y + ' workouts' } }
       },
-      scales: { ...chartDefaults.scales, y: { ...chartDefaults.scales.y, title: axisTitle('Number of Workouts') } }
+      scales: {
+        x: xAxis(),
+        y: { ...yAxis('Workouts'), ticks: { ...TICK, stepSize: 1 }, min: 0 }
+      }
     }
   });
 }
 
-// Bodyweight chart with 7-day moving average
-const bwLabels = {{ bw_labels|safe }};
+// ── 2. Bodyweight — line + 7-day MA ──────────────────────────────────────────
+const bwRaw    = {{ bw_labels|safe }};
 const bwData   = {{ bw_data|safe }};
-if (bwLabels.length) {
+if (bwRaw.length) {
+  const bwLabels = bwRaw.map(s => fmtDate(s));
+
   function movingAverage(data, win) {
     return data.map((_, i) => {
       if (i < win - 1) return null;
@@ -191,78 +240,112 @@ if (bwLabels.length) {
     });
   }
   const bwMaData = movingAverage(bwData, 7);
+
   new Chart(document.getElementById('bwChart'), {
     type: 'line',
     data: {
       labels: bwLabels,
       datasets: [
-        { label: 'Weight', data: bwData, borderColor: '#58a6ff', backgroundColor: 'rgba(88,166,255,0.1)', tension: 0.3, fill: true, pointRadius: 4 },
-        { label: '7-day avg', data: bwMaData, borderColor: '#d2a8ff', borderDash: [4, 4], borderWidth: 2, pointRadius: 0, fill: false, tension: 0.4, spanGaps: false }
+        {
+          label: 'Bodyweight',
+          data: bwData,
+          borderColor: '#58a6ff',
+          backgroundColor: 'rgba(88,166,255,0.06)',
+          fill: true,
+          tension: 0.3,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+        },
+        {
+          label: '7-day avg',
+          data: bwMaData,
+          borderColor: '#d2a8ff',
+          borderDash: [5, 4],
+          borderWidth: 2,
+          pointRadius: 0,
+          fill: false,
+          tension: 0.4,
+          spanGaps: false,
+        }
       ]
     },
     options: {
       ...chartDefaults,
       plugins: {
         ...chartDefaults.plugins,
-        legend: { display: true, position: 'bottom', labels: legendLabels },
-        tooltip: { callbacks: { label: ctx => ctx.parsed.y + ' kg' } }
+        legend: { display: true, position: 'bottom', labels: LEGEND },
+        tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y + ' kg' } }
       },
-      scales: { ...chartDefaults.scales, y: { ...chartDefaults.scales.y, title: axisTitle('Weight (kg)') } }
+      scales: {
+        x: xAxis({ ticks: { ...TICK, maxTicksLimit: 8 } }),
+        y: yAxis('kg')
+      }
     }
   });
 }
 
-// Exercise progress bubble chart (x=date index, y=weight, radius=sets)
-const exLabels   = {{ ex_labels|safe }};
+// ── 3. Exercise Progress — line (weight) + bar (sets) ────────────────────────
+const exRaw      = {{ ex_labels|safe }};
 const exData     = {{ ex_data|safe }};
 const exSetsData = {{ ex_sets_data|safe }};
 const exRepsData = {{ ex_reps_data|safe }};
-if (exLabels.length && document.getElementById('exChart')) {
-  const bubbleData = exLabels.map((_, i) => ({
-    x: i,
-    y: exData[i],
-    r: Math.max(5, exSetsData[i] * 5)
-  }));
+if (exRaw.length && document.getElementById('exChart')) {
+  const exLabels = exRaw.map(s => fmtDate(s));
   new Chart(document.getElementById('exChart'), {
-    type: 'bubble',
+    type: 'bar',
     data: {
-      datasets: [{
-        label: 'Session',
-        data: bubbleData,
-        backgroundColor: 'rgba(63,185,80,0.55)',
-        borderColor: '#3fb950',
-        borderWidth: 1.5,
-        hoverBackgroundColor: 'rgba(88,166,255,0.7)',
-        hoverBorderColor: '#58a6ff',
-      }]
+      labels: exLabels,
+      datasets: [
+        {
+          type: 'line',
+          label: 'Weight (kg)',
+          data: exData,
+          borderColor: '#58a6ff',
+          backgroundColor: 'rgba(88,166,255,0.08)',
+          fill: true,
+          tension: 0.3,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          yAxisID: 'y',
+          order: 1,
+        },
+        {
+          type: 'bar',
+          label: 'Sets',
+          data: exSetsData,
+          backgroundColor: 'rgba(63,185,80,0.35)',
+          borderColor: '#3fb950',
+          borderWidth: 1,
+          borderRadius: 3,
+          yAxisID: 'y1',
+          order: 2,
+        }
+      ]
     },
     options: {
       ...chartDefaults,
+      interaction: { mode: 'index', intersect: false },
       plugins: {
         ...chartDefaults.plugins,
-        legend: { display: false },
+        legend: { display: true, position: 'bottom', labels: LEGEND },
         tooltip: {
           callbacks: {
-            title: ctx => exLabels[ctx[0].dataIndex],
-            label: ctx => {
-              const i = ctx.dataIndex;
-              return [`Weight: ${exData[i]} kg`, `Sets: ${exSetsData[i]}`, `Reps: ${exRepsData[i]}`];
+            afterBody: ctx => {
+              const i = ctx[0].dataIndex;
+              return [`Reps: ${exRepsData[i]}`];
             }
           }
         }
       },
       scales: {
-        ...chartDefaults.scales,
-        x: {
-          ...chartDefaults.scales.x,
-          ticks: {
-            ...chartDefaults.scales.x.ticks,
-            callback: (val) => exLabels[val] ?? val
-          }
-        },
-        y: {
-          ...chartDefaults.scales.y,
-          title: axisTitle('Weight (kg)')
+        x: xAxis({ ticks: { ...TICK, maxTicksLimit: 10 } }),
+        y:  { ...yAxis('Weight (kg)'), position: 'left' },
+        y1: {
+          position: 'right',
+          ticks: { ...TICK, stepSize: 1 },
+          grid: { drawOnChartArea: false },
+          title: axisTitle('Sets'),
+          min: 0,
         }
       }
     }
