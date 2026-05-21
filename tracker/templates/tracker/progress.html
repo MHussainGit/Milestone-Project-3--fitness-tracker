@@ -18,8 +18,8 @@
       <div class="stat-card__label">Day Streak</div>
     </div>
     <div class="stat-card">
-      <div class="stat-card__value">{{ total_volume|floatformat:"0" }}</div>
-      <div class="stat-card__label">Lifetime Volume (kg)</div>
+      <div class="stat-card__value">{{ avg_per_week }}</div>
+      <div class="stat-card__label">Avg Workouts / Week</div>
     </div>
     <div class="stat-card">
       <div class="stat-card__value">{{ pr_count }}</div>
@@ -96,8 +96,8 @@
     {% if selected_exercise and ex_data != '[]' %}
       <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem">
         <div class="stat-card" style="flex:1;min-width:180px;padding:1rem">
-          <div class="stat-card__value">{{ ex_latest_weight }} kg</div>
-          <div class="stat-card__label">Latest weight</div>
+          <div class="stat-card__value">{{ ex_latest_e1rm }} kg</div>
+          <div class="stat-card__label">Latest est. 1RM</div>
         </div>
         <div class="stat-card" style="flex:1;min-width:180px;padding:1rem">
           <div class="stat-card__value">{{ ex_latest_sets }}</div>
@@ -298,7 +298,7 @@ if (exRaw.length && document.getElementById('exChart')) {
       datasets: [
         {
           type: 'line',
-          label: 'Weight (kg)',
+          label: 'Est. 1RM (kg)',
           data: exData,
           borderColor: '#58a6ff',
           backgroundColor: 'rgba(88,166,255,0.08)',
@@ -339,7 +339,7 @@ if (exRaw.length && document.getElementById('exChart')) {
       },
       scales: {
         x: xAxis({ ticks: { ...TICK, maxTicksLimit: 10 } }),
-        y:  { ...yAxis('Weight (kg)'), position: 'left' },
+        y:  { ...yAxis('Est. 1RM (kg)'), position: 'left' },
         y1: {
           position: 'right',
           ticks: { ...TICK, stepSize: 1 },

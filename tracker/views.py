@@ -11,7 +11,7 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.utils import timezone
 from django.views.generic import CreateView, UpdateView, DeleteView
-from django.db.models import Count, Sum, F, ExpressionWrapper, DecimalField
+from django.db.models import Count, Sum
 import csv
 import json
 
@@ -460,11 +460,12 @@ def progress(request):
     # Summary stat cards
     total_workouts = Workout.objects.filter(user=request.user).count()
     streak = Workout.objects.streak(request.user)
-    total_volume = WorkoutEntry.objects.filter(
-        workout__user=request.user, weight__isnull=False
-    ).aggregate(
-        v=Sum(ExpressionWrapper(F('sets') * F('reps') * F('weight'), output_field=DecimalField()))
-    )['v'] or 0
+    first_workout = Workout.objects.filter(user=request.user).order_by('date').first()
+    if first_workout and total_workouts > 1:
+        weeks_elapsed = max(1, (timezone.now().date() - first_workout.date).days / 7)
+        avg_per_week = round(total_workouts / weeks_elapsed, 1)
+    else:
+        avg_per_week = float(total_workouts)
     pr_count = PersonalRecord.objects.filter(user=request.user).count()
 
     # Bodyweight chart data
@@ -507,7 +508,7 @@ def progress(request):
     ex_data = []
     ex_sets_data = []
     ex_reps_data = []
-    ex_latest_weight = None
+    ex_latest_e1rm = None
     ex_latest_sets = None
     selected_exercise = None
 
@@ -523,12 +524,12 @@ def progress(request):
         if cutoff:
             ex_qs = ex_qs.filter(workout__date__gte=cutoff)
         ex_labels    = [str(e.workout.date) for e in ex_qs]
-        ex_data      = [float(e.weight) for e in ex_qs]
+        ex_data      = [round(float(e.weight) * (1 + (e.reps or 1) / 30), 1) for e in ex_qs]
         ex_sets_data = [e.sets for e in ex_qs]
         ex_reps_data = [e.reps for e in ex_qs]
         if ex_qs:
             last_entry = ex_qs.last()
-            ex_latest_weight = float(last_entry.weight)
+            ex_latest_e1rm = round(float(last_entry.weight) * (1 + (last_entry.reps or 1) / 30), 1)
             ex_latest_sets = last_entry.sets
 
     # All PRs — always lifetime, not date-filtered
@@ -541,7 +542,7 @@ def progress(request):
     context = {
         'total_workouts':    total_workouts,
         'streak':            streak,
-        'total_volume':      round(float(total_volume)),
+        'avg_per_week':      avg_per_week,
         'pr_count':          pr_count,
         'range_param':       range_param,
         'range_options':     range_options,
@@ -554,7 +555,7 @@ def progress(request):
         'ex_data':           json.dumps(ex_data),
         'ex_sets_data':      json.dumps(ex_sets_data),
         'ex_reps_data':      json.dumps(ex_reps_data),
-        'ex_latest_weight':  ex_latest_weight,
+        'ex_latest_e1rm':    ex_latest_e1rm,
         'ex_latest_sets':    ex_latest_sets,
         'exercises':         exercises,
         'selected_exercise': selected_exercise,
