@@ -388,12 +388,12 @@ textarea:focus,
 .badge {
   display: inline-block; padding: .16rem .5rem; border-radius: 999px;
   font-size: .68rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em;
-  background: var(--surface2); color: var(--muted); border: 1px solid var(--border);
+  background: var(--surface2); color: var(--text); border: 1px solid var(--border);
 }
-.badge-accent      { background: rgba(212,255,0,.1);  color: var(--accent);  border-color: var(--accent); }
+.badge-accent      { background: rgba(88,166,255,.1);  color: var(--accent);  border-color: var(--accent); }
 .badge-info        { background: rgba(79,163,255,.1); color: var(--info);    border-color: var(--info); }
-.badge-success     { background: rgba(61,224,160,.1); color: var(--success); border-color: var(--success); }
-.badge-strength    { background: rgba(212,255,0,.1);  color: var(--accent);  border-color: var(--accent); }
+.badge-success     { background: rgba(63,185,80,.1);  color: var(--success); border-color: var(--success); }
+.badge-strength    { background: rgba(229,255,28,.1);  color: #e5ff1c;  border-color: #e5ff1c; }
 .badge-cardio      { background: rgba(255,69,69,.1);  color: #ff8080;        border-color: #ff8080; }
 .badge-flexibility { background: rgba(79,163,255,.1); color: var(--info);    border-color: var(--info); }
 
