@@ -38,35 +38,37 @@
         {{ formset.management_form }}
         <div id="formset-rows">
           {% for entry_form in formset %}
-            <div class="formset-row form-row" style="margin-bottom:.75rem;align-items:end">
-              <div class="form-group" style="margin:0;min-width:160px;flex:2">
+            <div class="formset-row" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:.75rem 1rem;margin-bottom:.6rem">
+              <div class="form-group" style="margin-bottom:.6rem">
                 <label class="form-label" style="font-size:.75rem">Exercise</label>
                 {{ entry_form.exercise }}
                 {% if entry_form.exercise.errors %}
                   <div class="form-error">{{ entry_form.exercise.errors.0 }}</div>
                 {% endif %}
               </div>
-              <div class="form-group" style="margin:0;min-width:70px">
-                <label class="form-label" style="font-size:.75rem">Sets</label>
-                {{ entry_form.sets }}
-                {% if entry_form.sets.errors %}
-                  <div class="form-error">{{ entry_form.sets.errors.0 }}</div>
-                {% endif %}
-              </div>
-              <div class="form-group" style="margin:0;min-width:70px">
-                <label class="form-label" style="font-size:.75rem">Reps</label>
-                {{ entry_form.reps }}
-                {% if entry_form.reps.errors %}
-                  <div class="form-error">{{ entry_form.reps.errors.0 }}</div>
-                {% endif %}
-              </div>
-              <div class="form-group" style="margin:0;min-width:80px">
-                <label class="form-label" style="font-size:.75rem">Weight (kg)</label>
-                {{ entry_form.weight }}
-              </div>
-              <div class="form-group" style="margin:0;flex:2;min-width:120px">
-                <label class="form-label" style="font-size:.75rem">Notes</label>
-                {{ entry_form.notes }}
+              <div class="form-row" style="gap:.6rem">
+                <div class="form-group" style="margin:0;min-width:70px;max-width:100px">
+                  <label class="form-label" style="font-size:.75rem">Sets</label>
+                  {{ entry_form.sets }}
+                  {% if entry_form.sets.errors %}
+                    <div class="form-error">{{ entry_form.sets.errors.0 }}</div>
+                  {% endif %}
+                </div>
+                <div class="form-group" style="margin:0;min-width:70px;max-width:100px">
+                  <label class="form-label" style="font-size:.75rem">Reps</label>
+                  {{ entry_form.reps }}
+                  {% if entry_form.reps.errors %}
+                    <div class="form-error">{{ entry_form.reps.errors.0 }}</div>
+                  {% endif %}
+                </div>
+                <div class="form-group" style="margin:0;min-width:80px;max-width:120px">
+                  <label class="form-label" style="font-size:.75rem">Weight (kg)</label>
+                  {{ entry_form.weight }}
+                </div>
+                <div class="form-group" style="margin:0;flex:1;min-width:120px">
+                  <label class="form-label" style="font-size:.75rem">Notes</label>
+                  {{ entry_form.notes }}
+                </div>
               </div>
             </div>
           {% endfor %}
