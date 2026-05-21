@@ -337,8 +337,8 @@ textarea:focus,
   transition: border-color var(--t), transform var(--t);
 }
 .stat-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-.stat-card__value { font-family: var(--font-d); font-size: clamp(2rem,6vw,3rem); color: var(--accent); line-height: 1; }
-.stat-card__label { font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-top: .3rem; }
+.stat-card__value { font-family: var(--font-d); font-size: clamp(2rem,6vw,3rem); color: var(--text); line-height: 1; }
+.stat-card__label { font-size: .72rem; color: var(--text); text-transform: uppercase; letter-spacing: .08em; margin-top: .3rem; }
 
 /* ════════════════════════════════════════════════════
    QUICK ACTIONS
