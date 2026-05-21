@@ -506,6 +506,7 @@ def progress(request):
     ex_labels = []
     ex_data = []
     ex_sets_data = []
+    ex_reps_data = []
     ex_latest_weight = None
     ex_latest_sets = None
     selected_exercise = None
@@ -524,6 +525,7 @@ def progress(request):
         ex_labels    = [str(e.workout.date) for e in ex_qs]
         ex_data      = [float(e.weight) for e in ex_qs]
         ex_sets_data = [e.sets for e in ex_qs]
+        ex_reps_data = [e.reps for e in ex_qs]
         if ex_qs:
             last_entry = ex_qs.last()
             ex_latest_weight = float(last_entry.weight)
@@ -551,6 +553,7 @@ def progress(request):
         'ex_labels':         json.dumps(ex_labels),
         'ex_data':           json.dumps(ex_data),
         'ex_sets_data':      json.dumps(ex_sets_data),
+        'ex_reps_data':      json.dumps(ex_reps_data),
         'ex_latest_weight':  ex_latest_weight,
         'ex_latest_sets':    ex_latest_sets,
         'exercises':         exercises,

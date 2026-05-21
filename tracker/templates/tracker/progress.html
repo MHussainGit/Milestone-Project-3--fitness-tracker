@@ -216,31 +216,58 @@ if (bwLabels.length) {
   });
 }
 
-// Exercise progress chart
+// Exercise progress bubble chart (x=date index, y=weight, radius=sets)
 const exLabels   = {{ ex_labels|safe }};
 const exData     = {{ ex_data|safe }};
 const exSetsData = {{ ex_sets_data|safe }};
+const exRepsData = {{ ex_reps_data|safe }};
 if (exLabels.length && document.getElementById('exChart')) {
+  const bubbleData = exLabels.map((_, i) => ({
+    x: i,
+    y: exData[i],
+    r: Math.max(5, exSetsData[i] * 5)
+  }));
   new Chart(document.getElementById('exChart'), {
-    type: 'line',
+    type: 'bubble',
     data: {
-      labels: exLabels,
-      datasets: [
-        { label: 'Weight (kg)', data: exData, borderColor: '#3de0a0', backgroundColor: 'rgba(61,224,160,0.1)', tension: 0.3, fill: true, pointRadius: 5, yAxisID: 'y' },
-        { label: 'Sets', data: exSetsData, type: 'line', borderColor: '#ffa500', backgroundColor: 'rgba(255,165,0,0.2)', tension: 0.3, fill: false, pointRadius: 4, yAxisID: 'y1' }
-      ]
+      datasets: [{
+        label: 'Session',
+        data: bubbleData,
+        backgroundColor: 'rgba(61,224,160,0.55)',
+        borderColor: '#3de0a0',
+        borderWidth: 1.5,
+        hoverBackgroundColor: 'rgba(229,255,28,0.7)',
+        hoverBorderColor: '#e5ff1c',
+      }]
     },
     options: {
       ...chartDefaults,
       plugins: {
         ...chartDefaults.plugins,
-        legend: { display: true, position: 'bottom', labels: { color: '#f1f1f1' } },
-        tooltip: { callbacks: { label: ctx => ctx.dataset.label === 'Sets' ? ctx.parsed.y + ' sets' : ctx.parsed.y + ' kg' } }
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: ctx => exLabels[ctx[0].dataIndex],
+            label: ctx => {
+              const i = ctx.dataIndex;
+              return [`Weight: ${exData[i]} kg`, `Sets: ${exSetsData[i]}`, `Reps: ${exRepsData[i]}`];
+            }
+          }
+        }
       },
       scales: {
         ...chartDefaults.scales,
-        y: { ...chartDefaults.scales.y, title: { display: true, text: 'Weight (kg)', color: '#e5ff1c', font: { size: 12, weight: 'bold' } } },
-        y1: { position: 'right', grid: { drawOnChartArea: false, color: '#2e2e2e' }, ticks: { color: '#777' }, title: { display: true, text: 'Sets', color: '#ffa500', font: { size: 12, weight: 'bold' } } }
+        x: {
+          ...chartDefaults.scales.x,
+          ticks: {
+            ...chartDefaults.scales.x.ticks,
+            callback: (val) => exLabels[val] ?? val
+          }
+        },
+        y: {
+          ...chartDefaults.scales.y,
+          title: { display: true, text: 'Weight (kg)', color: '#e5ff1c', font: { size: 12, weight: 'bold' } }
+        }
       }
     }
   });
