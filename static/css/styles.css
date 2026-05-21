@@ -525,7 +525,7 @@ textarea:focus,
   border-radius: var(--r-lg); padding: 1.25rem;
   transition: border-color var(--t);
 }
-.card-accent { border-left: 3px solid var(--accent); }
+.card-accent { border-color: var(--accent); }
 
 /* ════════════════════════════════════════════════════
    FORMS

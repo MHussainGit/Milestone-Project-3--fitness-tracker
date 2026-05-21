@@ -113,16 +113,16 @@
         <h2 class="section-head">Today's Note <span aria-hidden="true">📝</span></h2>
         {% if todays_note %}
           <div class="card card-accent">
-            <div style="font-size:1.4rem;margin-bottom:.4rem">
+            <div style="font-size:1.4rem;margin-bottom:.4rem;color:var(--text)">
               {% if todays_note.mood == 'great' %}💪{% elif todays_note.mood == 'good' %}😊{% elif todays_note.mood == 'ok' %}😐{% elif todays_note.mood == 'tired' %}😴{% elif todays_note.mood == 'bad' %}😞{% endif %}
               {{ todays_note.get_mood_display }}
             </div>
-            <p style="color:var(--muted)">{{ todays_note.content }}</p>
+            <p style="color:var(--text)">{{ todays_note.content }}</p>
             <a href="{% url 'notes_list' %}" class="btn btn-secondary btn-sm" style="margin-top:.75rem">Edit</a>
           </div>
         {% else %}
           <div class="card">
-            <p style="color:var(--muted);margin-bottom:.75rem">No note for today yet.</p>
+            <p style="color:var(--text);margin-bottom:.75rem">No note for today yet.</p>
             <a href="{% url 'notes_list' %}" class="btn btn-secondary btn-sm">Add Note</a>
           </div>
         {% endif %}
