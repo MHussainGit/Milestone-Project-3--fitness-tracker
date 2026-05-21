@@ -66,7 +66,7 @@ class WorkoutQuerySet(models.QuerySet):
             current_date -= timedelta(days=1)
 
         return streak
-    
+
 
 class WorkoutManager(models.Manager):
     def get_queryset(self):
