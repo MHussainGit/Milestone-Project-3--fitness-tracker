@@ -17,8 +17,8 @@
     --border: #3c4048;
     --accent: #e5ff1c;
     --accent2: #e5e5e5;
-    --text: #f1f1f1;
-    --muted: #f1f1f1;
+    --text: #ffffff;
+    --muted: #ffffff;
     --danger: #ff5a5a;
     --info: #67e1ff;
     --success: #57d377;
@@ -111,14 +111,14 @@ button {
 /* CTA button in nav */
 .nav-cta {
     background: var(--accent) !important;
-    color: white !important;
+    color: #0c0c0c !important;
     border: none;
     font-weight: 500;
 }
 
 .nav-cta:hover {
     background: var(--accent2) !important;
-    color: white !important;
+    color: #0c0c0c !important;
 }
 
 /* Footer */
@@ -510,10 +510,10 @@ textarea:focus,
 .btn-primary:hover   { background: var(--accent2); border-color: var(--accent2); color: #0c0c0c; }
 .btn-secondary { background: transparent; color: var(--text); border-color: var(--border); }
 .btn-secondary:hover { border-color: var(--muted); background: var(--surface2); color: var(--text); }
-.btn-danger    { background: transparent; color: var(--danger); border-color: var(--danger); }
-.btn-danger:hover    { background: var(--danger); color: #fff; }
-.btn-info      { background: transparent; color: var(--info); border-color: var(--info); }
-.btn-info:hover      { background: var(--info); color: #fff; }
+.btn-danger    { background: transparent; color: #ffffff; border-color: var(--danger); }
+.btn-danger:hover    { background: var(--danger); color: #ffffff; }
+.btn-info      { background: transparent; color: #ffffff; border-color: var(--info); }
+.btn-info:hover      { background: var(--info); color: #ffffff; }
 .btn-sm   { padding: .25rem .6rem; font-size: .75rem; }
 .btn-full { width: 100%; justify-content: center; }
 
