@@ -120,12 +120,15 @@ STATIC_URL       = '/static/'
 STATIC_ROOT      = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
-# Use simple storage for testing, manifest for production (via environ or deployment)
-# This avoids manifest errors in test/dev environments
-if os.environ.get('USE_MANIFEST_STORAGE') == '1':
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-else:
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+_static_backend = (
+    'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    if os.environ.get('USE_MANIFEST_STORAGE') == '1'
+    else 'django.contrib.staticfiles.storage.StaticFilesStorage'
+)
+STORAGES = {
+    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+    'staticfiles': {'BACKEND': _static_backend},
+}
 
 # ── Misc ───────────────────────────────────────────────────────────────────
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

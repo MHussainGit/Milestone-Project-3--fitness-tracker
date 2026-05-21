@@ -270,10 +270,11 @@ class WorkoutDeleteView(LoginRequiredMixin, DeleteView):
         })
         return context
 
-    def delete(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        messages.info(request, f'"{self.object.name}" deleted.')
-        return super().delete(request, *args, **kwargs)
+    def form_valid(self, form):
+        name = self.object.name
+        response = super().form_valid(form)
+        messages.info(self.request, f'"{name}" deleted.')
+        return response
 
 
 @login_required
