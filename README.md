@@ -546,10 +546,15 @@ All templates use semantic HTML5 elements and were tested using the W3C Markup V
 
 All styles are hand-written in a single stylesheet using modern CSS3.
 
+- ✅ Validated with the [W3C CSS Validation Service](https://jigsaw.w3.org/css-validator/) — **0 errors**
 - ✅ CSS custom properties (`--var`) used for all colours, fonts, and spacing
 - ✅ CSS Grid and Flexbox for all layouts
-- ✅ Media queries at 768px, 900px, 1100px, and 1300px breakpoints
+- ✅ Media queries at 400px, 600px, 768px, 960px, 1024px, and 1025px+ breakpoints
 - ✅ `clamp()` used for fluid typography on headings and stat values
+
+**Warnings (142):** All warnings are expected and informational:
+- 140 × *"CSS variables are currently not statically checked"* — the W3C validator cannot evaluate `var()` values at parse time; this is a known limitation, not a bug
+- 2 × *"-webkit-overflow-scrolling is a vendor extension"* — retained for legacy iOS Safari scroll momentum support
 
 ---
 
