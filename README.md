@@ -164,16 +164,47 @@ FitTrack addresses the needs of gym users who require a fast, reliable logging t
 The website wireframes were created using Balsamiq and can be viewed below.
 
 ### Desktop Wireframes:
-#### Design layout for the desktop version of the home page
-#### ![Desktop - Home](<assets/images/Desktop - Home.png>)
-#### Design layout for the desktop version of the popular destinations page
-#### ![Desktop - Popular Destinations](<assets/images/Desktop - Popular Destinations.png>)
+#### Design layout for the desktop version of the Registration page
+#### ![Desktop - Registration](<assets/wireframes/Registration-Page.png>)
+#### Design layout for the desktop version of the Login page
+#### ![Desktop - Login](<assets/wireframes/Login-Page.png>)
+#### Design layout for the desktop version of the Dashboard page
+#### ![Desktop - Dashboard](<assets/wireframes/Dashboard.png>)
+#### Design layout for the desktop version of the Workouts page
+#### ![Desktop - Workouts](<assets/wireframes/Workouts.png>)
+#### Design layout for the desktop version of the Exercises page
+#### ![Desktop - Exercises](<assets/wireframes/Exercises.png>)
+#### Design layout for the desktop version of the Progress page
+#### ![Desktop - Progress](<assets/wireframes/Progress.png>)
+#### Design layout for the desktop version of the Notes page
+#### ![Desktop - Notes](<assets/wireframes/Notes.png>)
+#### Design layout for the desktop version of the +Log Workout page
+#### ![Desktop - +Log Workout](<assets/wireframes/+Log-Workout.png>)
+#### Design layout for the desktop version of the My Profile page
+#### ![Desktop - My Profile](<assets/wireframes/My-Profile.png>)
+
+
 
 ### Mobile Wireframes:
-#### Design layout for the mobile version of the home page
-#### ![Mobile - Home](<assets/images/Mobile - Home.png>)
-#### Design layout for the mobile version of the popular destinations page
-#### ![Mobile - Popular Destinations](<assets/images/Mobile - Popular Destinations.png>)
+#### Design layout for the mobile version of the Registration page
+#### ![Mobile - Registration](<assets/wireframes/Registration-Page-Mobile.png>)
+#### Design layout for the mobile version of the Login page
+#### ![Mobile - Login](<assets/wireframes/Login-Page-Mobile.png>)
+#### Design layout for the mobile version of the Dashboard page
+#### ![Mobile - Dashboard](<assets/wireframes/Dashboard-Mobile.png>)
+#### Design layout for the mobile version of the Workouts page
+#### ![Mobile - Workouts](<assets/wireframes/Workouts-Mobile.png>)
+#### Design layout for the mobile version of the Exercises page
+#### ![Mobile - Exercises](<assets/wireframes/Exercises-Mobile.png>)
+#### Design layout for the mobile version of the Progress page
+#### ![Mobile - Progress](<assets/wireframes/Progress-Mobile.png>)
+#### Design layout for the mobile version of the Notes page
+#### ![Mobile - Notes](<assets/wireframes/Notes-Mobile.png>)
+#### Design layout for the mobile version of the +Log Workout page
+#### ![Mobile - +Log Workout](<assets/wireframes/+Log-Workout-Mobile.png>)
+#### Design layout for the mobile version of the My Profile page
+#### ![Mobile - My Profile](<assets/wireframes/My-Profile-Mobile.png>)
+
 
 ---
 
