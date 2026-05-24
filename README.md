@@ -527,6 +527,8 @@ The project uses Django's built-in form validation and adheres to PEP 8 style gu
 - All views are protected by `@login_required` or `LoginRequiredMixin`
 - `full_clean()` is called implicitly on all form saves
 
+- ✅ Pylint score: **9.77/10** — see [docs/pylint.md](docs/pylint.md) for the full report
+
 **Validation checks performed:**
 - ✅ Required fields enforced (username, password, workout name, exercise name, sets, reps)
 - ✅ Unique constraints enforced (username, email, exercise name)

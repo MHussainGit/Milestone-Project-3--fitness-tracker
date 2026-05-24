@@ -1,0 +1,21 @@
+[MASTER]
+load-plugins=pylint_django
+django-settings-module=fittrack.settings
+ignore=migrations
+
+[MESSAGES CONTROL]
+disable=
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring,
+    too-few-public-methods,
+    too-many-ancestors,
+    no-member,
+    broad-exception-caught,
+    too-many-locals,
+    too-many-branches,
+    too-many-statements,
+    imported-auth-user
+
+[FORMAT]
+max-line-length=120

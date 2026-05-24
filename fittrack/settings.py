@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 
 import dj_database_url
+from django.contrib.messages import constants as message_constants
 from dotenv import load_dotenv
 
 # Load .env file when running locally — no-op on Heroku (vars already in env)
@@ -119,14 +120,14 @@ STATIC_URL       = '/static/'
 STATIC_ROOT      = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
-_static_backend = (
+STATIC_BACKEND = (
     'whitenoise.storage.CompressedManifestStaticFilesStorage'
     if os.environ.get('USE_MANIFEST_STORAGE') == '1'
     else 'django.contrib.staticfiles.storage.StaticFilesStorage'
 )
 STORAGES = {
     'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
-    'staticfiles': {'BACKEND': _static_backend},
+    'staticfiles': {'BACKEND': STATIC_BACKEND},
 }
 
 # ── Email ──────────────────────────────────────────────────────────────────
@@ -145,5 +146,4 @@ DEFAULT_FROM_EMAIL  = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@fittrack.app
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Django messages use 'error' tag but Bootstrap/our CSS uses 'danger'
-from django.contrib.messages import constants as message_constants  # noqa: E402
 MESSAGE_TAGS = {message_constants.ERROR: 'error'}

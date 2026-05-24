@@ -1,19 +1,19 @@
 """
 tracker/views.py — All view functions for FitTrack.
 """
+import csv
+import json
 from datetime import timedelta
-from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse, reverse_lazy
+
+from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib import messages
 from django.http import HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.views.generic import CreateView, UpdateView, DeleteView
-from django.db.models import Count, Sum
-import csv
-import json
+from django.views.generic import UpdateView, DeleteView
 
 from .models import (
     Workout, WorkoutEntry, Exercise,

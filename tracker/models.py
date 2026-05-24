@@ -191,7 +191,7 @@ class PersonalRecord(models.Model):
 
     def __str__(self):
         return f"{self.user.username} PR — {self.exercise.name}: {self.best_weight}kg"
-    
+
     def est_1rm(self):
         """Calculate estimated 1RM using Epley formula: Weight × (1 + Reps/30)"""
         if self.best_reps <= 12:
