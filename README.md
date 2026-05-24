@@ -4,7 +4,7 @@
 ![Django](https://img.shields.io/badge/Django-4.2-green)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)
 
-A comprehensive web application designed to help fitness enthusiasts log, track, and analyze their gym workouts with precision and ease. The application offers a simple, intuitive interface for recording exercise sessions, building workout history, and visualizing progress over time.
+A full-stack web application for logging, tracking, and analysing gym workouts. FitTrack provides a clean, dark-themed interface for recording exercise sessions, building workout history, visualising progress over time, and managing personal records.
 
 ## Table of Contents
 
@@ -37,16 +37,19 @@ A comprehensive web application designed to help fitness enthusiasts log, track,
 
 ## Project Overview
 
-FitTrack is a full-stack web application that empowers users to systematically log, track, and review their gym workouts. Unlike mobile-only solutions or complex spreadsheet alternatives, FitTrack provides a dedicated web-based interface optimized for both desktop and mobile use, requiring no app installation or subscription fees.
+FitTrack is a full-stack web application that empowers users to systematically log, track, and review their gym workouts. Unlike mobile-only solutions or complex spreadsheet alternatives, FitTrack provides a dedicated web-based interface optimised for both desktop and mobile use, requiring no app installation or subscription fees.
 
 **Key focal points:**
-- A streamlined, intuitive web interface for workout logging
-- Secure user authentication and data privacy
-- Comprehensive exercise library with custom entry support
-- Real-time dashboard statistics (total workouts, volume, sets)
-- Responsive design built on modern HTML5, CSS3, and Django
-- Full CRUD functionality for workouts and exercise entries
-- Object-level access control ensuring data isolation between users
+- Streamlined workout logging with inline exercise entry (no separate page per exercise)
+- Progress charts: workout frequency, bodyweight trend, and per-exercise estimated 1RM
+- Personal records board with automatic PR detection on every save
+- Workout templates for quickly starting a session from a saved routine
+- Bodyweight tracker with 7-day moving average chart
+- Daily notes with mood tracking
+- CSV export of full workout history
+- Password reset via email
+- Arctic Blue dark theme with full responsive design
+- Secure user authentication and per-user data isolation
 
 ---
 
@@ -56,27 +59,25 @@ FitTrack addresses a critical pain point for fitness enthusiasts: the need for a
 
 ### Target Audiences & Their Needs
 
-The application is specifically designed to cater to three distinct types of users:
+1. **Serious Gym Enthusiasts & Strength Athletes**: Users who prioritise detailed workout logging, progressive overload tracking, and data-driven fitness decisions. They need precise recording of sets, reps, weight, and the ability to see estimated 1RM trends over time.
 
-1. **Serious Gym Enthusiasts & Strength Athletes**: Users who prioritize detailed workout logging, progressive overload tracking, and data-driven fitness decisions. They need precise recording of sets, reps, weight, and notes to analyze performance trends over time.
+2. **Casual Fitness Trackers & Beginners**: Individuals new to gym training who want a simple, no-frills tool to build a habit of logging workouts without intimidating complexity.
 
-2. **Casual Fitness Trackers & Beginners**: Individuals new to gym training who want a simple, no-frills tool to build a habit of logging workouts without intimidating complexity. They need clear guidance and minimal friction.
-
-3. **Mobile-First Athletes & On-the-Go Trainers**: Users who train at multiple locations and need quick access to their workout history via any internet-connected device—mobile phone, tablet, or desktop. They require fast load times and responsive layouts.
+3. **Mobile-First Athletes & On-the-Go Trainers**: Users who train at multiple locations and need quick access to their workout history via any internet-connected device. They require fast load times and responsive layouts.
 
 ### Value to the User
 
-The application delivers tangible, measurable value across four key dimensions:
+- **Accountability Through History**: A persistent, searchable workout log creates accountability and reveals patterns (e.g., "I haven't trained legs in 3 weeks").
 
-- **Accountability Through History**: By providing a persistent, searchable workout log, users gain an unambiguous record of their training. This creates accountability and reveals patterns (e.g., "I haven't trained back in 3 weeks").
+- **Progress Visualisation**: The progress page summarises key metrics — workout frequency, bodyweight trend, and per-exercise estimated 1RM — providing instant context about training performance.
 
-- **Progress Visualization**: The dashboard summarizes key metrics—total workouts, total sets, total volume (kg)—providing instant context about training volume. This metric drives motivation and informs recovery decisions.
+- **Automatic PR Detection**: Personal records are detected and stored automatically whenever a workout is saved, with a live PR board showing best weight, reps, and est. 1RM per exercise.
 
-- **Customizable Exercise Library**: Users can browse a pre-seeded library of common exercises or create custom entries, ensuring flexibility for any training style. The exercise library remains consistent across workouts, reducing data entry friction.
+- **Workout Templates**: Save and reuse workout structures (e.g., "Push Day", "Leg Day") to start a logged session in seconds.
 
-- **Data Privacy & Ownership**: Unlike web-based fitness social networks, FitTrack stores user data in a secure, password-protected account. Users control their own data; workouts are never shared or sold.
+- **Data Privacy & Ownership**: Users control their own data; workouts are never shared or sold.
 
-- **Zero Cost, No App Installation**: Running entirely in a web browser, FitTrack requires no mobile app download, no subscription, and no third-party account linking—lowering barriers to adoption.
+- **Zero Cost, No App Installation**: Running entirely in a web browser with no mobile app download, no subscription, and no third-party account linking.
 
 ---
 
@@ -90,71 +91,89 @@ FitTrack is designed for users who:
 - May train at different locations and access their data from multiple devices
 - Value data privacy and ownership
 
-The site aims to deliver quick workout logging via a minimal, distraction-free interface.
-
 ### Design Rationale
 
-**Purpose & Audience:**
-The application addresses regular fitness enthusiasts who need a lightweight, web-based logging tool. The design focuses on reducing friction by:
-- Placing the workout creation form front-and-center on the dashboard
-- Minimizing navigation depth (maximum 2 clicks to any feature)
-- Using consistent form patterns across all CRUD operations
-- Providing instant flash messages confirming every action
-- Displaying dashboard stats prominently for motivation
+**Dashboard as Hub**: The dashboard serves as the central hub, displaying summary stats, recent workouts, quick-action buttons, today's note, and recent personal records — everything the user needs without digging through menus.
 
-**Key Design Decisions:**
+**Inline Exercise Entry**: Exercises are logged directly within the new workout form (using an inline formset), removing the need to navigate to a separate page per exercise. "+ Add Exercise" appends a new row without a page reload.
 
-1. **Dashboard as Hub**: The dashboard serves as the application's central hub, displaying the user's personal statistics, recent workouts, and quick-access links to create new workouts. This reduces cognitive load and provides a single "home" reference point.
+**Progress Charts**: Three distinct chart types are used for different data shapes:
+- Frequency: area chart (shows volume of training over time)
+- Bodyweight: line with 7-day moving average dashed overlay
+- Exercise progress: mixed bar (sets) + line (estimated 1RM) with shared tooltip and reps shown on hover
 
-2. **Consistent Form Patterns**: All CREATE and UPDATE operations use identical form layouts (workout form, entry form, exercise form), allowing users to develop muscle memory and reduce learning curve.
+**Arctic Blue Dark Theme**: Custom CSS using CSS variables for consistent dark backgrounds (`#0d1117`), blue accent (`#58a6ff`), and off-white text (`#e6edf3`). No third-party CSS framework — all styles are hand-written.
 
-3. **Inline Exercise Entries**: Rather than navigating to separate pages for each exercise entry, entries are added within the workout detail page using a streamlined form, keeping related data visually grouped.
-
-4. **Mobile-First Responsive Grid**: Built on Bootstrap 5.3, the layout automatically adapts to phone (320px), tablet (768px), and desktop (1200px) viewports without awkward overflow.
-
-5. **Direct Access Control**: Users can only see and edit their own workouts. Attempting to access another user's data via URL directly returns a 404, preventing data leakage.
+**Grouped Exercise Dropdowns**: Exercises are grouped by muscle group using `<optgroup>`, making selection faster across a large library.
 
 ### Accessibility Considerations
 
-- Semantic HTML (`<nav>`, `<main>`, `<header>`, `<footer>`, `<form>`, `<label>`) provides structural clarity for assistive technologies
+- Semantic HTML (`<nav>`, `<main>`, `<header>`, `<footer>`, `<form>`, `<label>`) for assistive technologies
 - All form inputs have associated `<label>` elements with proper `for` attributes
-- Color is not the only indicator of status or error (icons and text also used)
-- Color contrast meets WCAG AA standards (4.5:1 for normal text, 3:1 for large text)
-- Keyboard navigation works throughout (Tab for focus, Enter to submit forms, Escape to close modals)
-- ARIA labels on interactive elements guide screen readers
-- Error messages are descriptive and contextual, not just generic "Error" alerts
-- Focus indicators are visible and have sufficient contrast
+- ARIA labels on charts and interactive elements
+- `sr-only` descriptions on all Chart.js canvas elements
+- `role="group"` and `aria-label` on date range filter buttons
+- Keyboard navigation works throughout
+- Error messages are descriptive and contextual
 
 ---
 
 ## User Stories
 
-1. **As a strength athlete**, I want to log my workout with exercise name, sets, reps, and weight so that I can track my progressive overload and analyze my training volume over time.
+1. **As a strength athlete**, I want to log my workout with exercise name, sets, reps, and weight so that I can track progressive overload and see my estimated 1RM trend over time.
 
-2. **As a casual gym user**, I want to create workouts quickly without complex setup so that I can build a habit of tracking my training without friction.
+2. **As a casual gym user**, I want to create workouts quickly with all exercises on one page so that I can log a full session without friction.
 
-3. **As a mobile user**, I want to access my workout history from my phone during or after my training session so that I can verify what weight I used last time and stay accountable.
+3. **As a returning user**, I want to start from a saved template so I don't have to re-enter the same exercises every session.
 
-4. **As a privacy-conscious user**, I want my workout data to be stored securely in my personal account so that my training information is not shared with third parties or visible to other users.
+4. **As a user tracking body composition**, I want to log my bodyweight daily and see a smoothed trend line so I can see progress through daily fluctuations.
 
-5. **As a developer**, I want the code to be well-structured and documented so that I can understand the application architecture and add new features or fix bugs easily.
+5. **As a mobile user**, I want to access my workout history from my phone so I can verify what weight I used last time and stay accountable.
+
+6. **As a privacy-conscious user**, I want my data stored securely in my personal account so it is not shared with third parties.
+
+7. **As a forgetful user**, I want to be able to reset my password via email so I'm not permanently locked out.
 
 ---
 
 ## Features
 
+### Workout Logging
+- **Inline Exercise Entry** — Add all exercises to a new workout on a single page using a formset; "+ Add Exercise" appends rows without a page reload
 - **Full CRUD for Workouts** — Create, read, update, and delete workouts with name, date, and notes
-- **Full CRUD for Exercise Entries** — Log sets, reps, weight, and optional notes for each exercise in a workout
-- **Exercise Library Management** — Browse, filter, and add exercises to a shared library
-- **User Authentication** — Secure registration, login, and logout with password hashing (PBKDF2)
-- **Access Control** — Users can only view and edit their own workouts; object-level authorization on all views
-- **Dashboard Statistics** — Display total workouts, total sets, and total volume (kg) lifted
-- **Exercise Filtering** — Search and filter exercises by name or category
-- **Flash Messages** — Instant visual feedback on every create / update / delete action
-- **Responsive Design** — Mobile-first layout using Bootstrap 5.3; works seamlessly on phones, tablets, and desktops
-- **Bodyweight Entry Support** — Log exercises without weight (e.g., push-ups, pull-ups)
-- **Workout Notes** — Add optional context or form notes to workouts
-- **Exercise Descriptions** — Record exercise form tips and muscle group information
+- **Full CRUD for Exercise Entries** — Log sets, reps, weight (optional for bodyweight exercises), and notes per entry
+- **CSV Export** — Download full workout history as a CSV file
+
+### Progress & Analytics
+- **Progress Page** — Four summary stat cards: Total Workouts, Day Streak, Avg Workouts/Week, Personal Records
+- **Date Range Filter** — Filter all charts simultaneously by 30d / 90d / 6m / 1y / All time
+- **Workout Frequency Chart** — Area chart showing workouts per week or month with human-readable labels
+- **Bodyweight Chart** — Line chart with 7-day moving average overlay
+- **Exercise Progress Chart** — Mixed bar (sets) + line (estimated 1RM via Epley formula) with shared tooltip
+- **Personal Records Board** — Lifetime PR table per exercise showing best weight, reps, est. 1RM, and date
+- **Automatic PR Detection** — PRs detected and updated whenever a workout is saved
+
+### Workout Templates
+- **Template Library** — Create and manage named workout templates (e.g., "Push Day")
+- **Template Detail** — View all exercises in a template with sets, reps, and notes
+- **Launch from Template** — Start a new workout pre-filled from a template in one click
+
+### Body & Wellbeing
+- **Bodyweight Tracker** — Log daily weigh-ins; chart with 7-day moving average
+- **Daily Notes** — Add daily notes with mood tracking (Great / Good / OK / Tired / Bad)
+- **Today's Note** — Displayed on the dashboard
+
+### Exercise Library
+- **Shared Library** — Browse exercises by name and muscle group
+- **Grouped Dropdowns** — Exercise selectors use `<optgroup>` labels by muscle group
+- **Custom Exercises** — Add exercises with category, muscle group, and description
+- **PROTECT constraint** — Exercises used in workouts cannot be deleted
+
+### User Account
+- **Registration & Login** — Secure registration and login with password hashing (PBKDF2)
+- **Password Reset** — Email-based forgot-password flow (4-step: request → sent → confirm → complete)
+- **Profile Page** — View account details and delete account
+- **Access Control** — All data scoped to the logged-in user; direct URL access to another user's data returns 404
 
 ---
 
@@ -164,17 +183,18 @@ The application addresses regular fitness enthusiasts who need a lightweight, we
 |---|---|---|
 | **Python** | 3.12 | Backend programming language |
 | **Django** | 4.2 | Web framework — routing, ORM, authentication, templates |
-| **PostgreSQL** | 16 | Relational database — secure, scalable data persistence |
+| **PostgreSQL** | 16 | Relational database |
 | **psycopg2** | Latest | PostgreSQL adapter for Python |
 | **dj-database-url** | Latest | Parse `DATABASE_URL` environment variable |
 | **gunicorn** | Latest | Production WSGI server |
-| **whitenoise** | Latest | Serve static CSS files efficiently in production |
+| **whitenoise** | Latest | Serve static files in production |
 | **python-dotenv** | Latest | Load `.env` file for local development |
+| **Chart.js** | 4.4.0 | Interactive progress charts (CDN) |
 | **HTML5** | — | Semantic markup and form structure |
-| **CSS3** | — | Responsive styling |
-| **Bootstrap** | 5.3 | Responsive grid, components, and utilities |
+| **CSS3** | — | Custom responsive styling (Arctic Blue dark theme, no framework) |
 | **Google Fonts** | — | Typography (Bebas Neue, DM Sans) |
-| **Heroku** | — | Cloud deployment and hosting platform |
+| **Heroku** | — | Cloud deployment and hosting |
+| **Resend / SMTP** | — | Transactional email for password reset |
 
 ---
 
@@ -183,135 +203,115 @@ The application addresses regular fitness enthusiasts who need a lightweight, we
 ### Prerequisites
 
 - **Python 3.12** or higher
-- **PostgreSQL** (v16 or higher) running locally or accessible via connection string
-- **Git** for version control
-- **VS Code** or any code editor
+- **PostgreSQL** (v16 or higher) running locally
+- **Git**
 
 ### Local Development Setup
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/fittrack.git
-cd fittrack
+git clone https://github.com/MHussainGit/Milestone-Project-3--fitness-tracker.git
+cd fitness-tracker
 
-# 2. Create a Python virtual environment
-python -m venv venv
-
-# 3. Activate the virtual environment
+# 2. Create and activate a virtual environment
+python -m venv .venv
 # Windows:
-venv\Scripts\activate
+.venv\Scripts\activate
 # macOS/Linux:
-source venv/bin/activate
+source .venv/bin/activate
 
-# 4. Install Python dependencies
+# 3. Install dependencies
 pip install -r requirements.txt
 
-# 5. Create the PostgreSQL database
-# Windows (open a separate terminal):
+# 4. Create the PostgreSQL database
 psql -U postgres -c "CREATE DATABASE fittrack;"
-# macOS/Linux:
-createdb fittrack
 
-# 6. Create a .env file from the template
+# 5. Create your .env file
 # Windows:
 copy .env.example .env
 # macOS/Linux:
 cp .env.example .env
 
-# 7. Edit .env and set these values:
+# 6. Edit .env — set SECRET_KEY and DATABASE_URL at minimum:
 #    SECRET_KEY=<any-long-random-string>
-#    DEBUG=True
-#    DATABASE_URL=postgresql://postgres:<your_password>@localhost:5432/fittrack
-#    ALLOWED_HOSTS=localhost,127.0.0.1
+#    DATABASE_URL=postgresql://postgres:<password>@localhost:5432/fittrack
 
-# 8. Run database migrations
+# 7. Run migrations
 python manage.py migrate
 
-# 9. Seed the exercise library (loads sample exercises)
+# 8. Seed the exercise library
 python manage.py seed_exercises
 
-# 10. (Optional) Create a superuser for the Django admin panel
+# 9. (Optional) Create a superuser for /admin/
 python manage.py createsuperuser
 
-# 11. Start the development server
+# 10. Start the dev server
 python manage.py runserver
-
-# 12. Open your browser and navigate to http://127.0.0.1:8000
 ```
 
-**First-Time User Flow:**
-1. Click "Register" on the login page
-2. Enter username, email, and password
-3. Click "Sign Up"
-4. You will be redirected to the dashboard (initially empty)
-5. Click "New Workout" to create your first workout
-6. Add exercises and set/rep/weight data
-7. Click "Save" — your workout is now logged
+Visit [http://127.0.0.1:8000](http://127.0.0.1:8000).
+
+### Running Tests
+
+```bash
+# Using pytest (recommended)
+.venv\Scripts\python.exe -m pytest
+
+# Or using Django's test runner
+python manage.py test
+```
 
 ---
 
 ## Deployment
 
-FitTrack is designed for deployment to **Heroku** with automatic database provisioning and migrations.
+FitTrack is deployed to **Heroku** with automatic migrations on every deploy.
 
-### Deployment Steps
+### Step-by-Step
 
-**Prerequisites:**
-- [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) installed and logged in
-- Git repository initialized (`git init`)
-- All changes committed (`git add . && git commit -m "message"`)
+```bash
+# 1. Create the app
+heroku create your-app-name
 
-**Step-by-Step Instructions:**
+# 2. Provision PostgreSQL
+heroku addons:create heroku-postgresql:essential-0
 
-1. **Create a Heroku app:**
-   ```bash
-   heroku create your-app-name
-   ```
+# 3. Set environment variables
+heroku config:set SECRET_KEY="$(python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())")"
+heroku config:set DEBUG=False
+heroku config:set ALLOWED_HOSTS=your-app-name.herokuapp.com
+heroku config:set CSRF_TRUSTED_ORIGINS=https://your-app-name.herokuapp.com
 
-2. **Provision PostgreSQL:**
-   ```bash
-   heroku addons:create heroku-postgresql:essential-0
-   ```
+# 4. Deploy
+git push heroku main
 
-3. **Set environment variables:**
-   ```bash
-   # Generate a secure secret key
-   heroku config:set SECRET_KEY="$(python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())")"
-   
-   # Set debug mode to False (production)
-   heroku config:set DEBUG=False
-   
-   # Set allowed hosts
-   heroku config:set ALLOWED_HOSTS=your-app-name.herokuapp.com
-   
-   # Set CSRF trusted origins
-   heroku config:set CSRF_TRUSTED_ORIGINS=https://your-app-name.herokuapp.com
-   ```
+# 5. Verify
+heroku open
+heroku logs --tail
+```
 
-4. **Deploy to Heroku:**
-   ```bash
-   git push heroku main
-   ```
+### Enabling Email (Password Reset)
 
-5. **Verify deployment:**
-   ```bash
-   heroku open                    # Opens app in browser
-   heroku logs --tail             # Stream logs in real-time
-   ```
+Password reset emails print to the terminal locally (console backend). For production, configure an SMTP provider:
 
-**Post-Deployment Verification Checklist:**
-- [ ] App loads without errors (check `heroku logs --tail`)
-- [ ] Registration and login work
-- [ ] Can create a workout
-- [ ] Can add exercise entries
-- [ ] Dashboard statistics display correctly
-- [ ] Responsive design works on mobile
-- [ ] Admin panel is accessible at `/admin/`
+```bash
+# Example using Resend (free tier: 3,000 emails/month)
+heroku config:set EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+heroku config:set EMAIL_HOST=smtp.resend.com
+heroku config:set EMAIL_PORT=587
+heroku config:set EMAIL_HOST_USER=resend
+heroku config:set EMAIL_HOST_PASSWORD=your_api_key
+heroku config:set DEFAULT_FROM_EMAIL=noreply@yourdomain.com
+```
 
-**Deployment Notes:**
-- The `Procfile` includes a `release` command that runs `python manage.py migrate` and `python manage.py seed_exercises` automatically on every deploy
-- Static files are served via WhiteNoise (no separate CDN required)
-- Database URL is automatically set by Heroku PostgreSQL addon
+See `.env.example` for full documentation of all email options.
+
+### Deployment Notes
+
+- `Procfile` runs `python manage.py migrate` and `python manage.py seed_exercises` automatically on every deploy
+- Static files are served via WhiteNoise — no separate CDN required
+- Python version is pinned via `.python-version` (contains `3.12`)
+- `DATABASE_URL` is set automatically by the Heroku PostgreSQL addon
 
 ---
 
@@ -321,44 +321,51 @@ FitTrack is designed for deployment to **Heroku** with automatic database provis
 
 ```
 User (Django auth_user)
- └─ Workout [user_id FK → User, CASCADE delete]
-     └─ WorkoutEntry [workout_id FK → Workout, CASCADE delete]
-                      [exercise_id FK → Exercise, PROTECT]
+ ├─ Workout            [user FK → User, CASCADE]
+ │   └─ WorkoutEntry   [workout FK → Workout, CASCADE]
+ │                      [exercise FK → Exercise, PROTECT]
+ ├─ PersonalRecord     [user FK → User, CASCADE]
+ │                      [exercise FK → Exercise, PROTECT]
+ ├─ BodyWeightEntry    [user FK → User, CASCADE]
+ ├─ DailyNote          [user FK → User, CASCADE]
+ └─ WorkoutTemplate    [user FK → User, CASCADE]
+     └─ WorkoutTemplateItem [template FK → WorkoutTemplate, CASCADE]
+                             [exercise FK → Exercise, PROTECT]
 
-Exercise (Shared Library)
+Exercise (shared library — no user FK)
 ```
 
 ### Table Descriptions
 
-| Table | Key Fields | Constraints | Notes |
-|---|---|---|---|
-| `auth_user` | id, username, email, password_hash | username UNIQUE, email UNIQUE | Django's built-in user model; passwords hashed with PBKDF2 |
-| `tracker_exercise` | id, name, category, muscle_group, description | name UNIQUE | Shared exercise library across all users |
-| `tracker_workout` | id, user_id, name, date, notes, created_at, updated_at | user_id FK (CASCADE) | Each workout belongs to one user; users can only see their own |
-| `tracker_workoutentry` | id, workout_id, exercise_id, sets, reps, weight, notes | workout_id FK (CASCADE), exercise_id FK (PROTECT) | Links workout to exercise; weight nullable for bodyweight exercises |
-
-**Key Design Decisions:**
-- `user_id` on `Workout` has CASCADE delete — deleting a user removes all their workouts
-- `exercise_id` on `WorkoutEntry` has PROTECT constraint — exercises used in workouts cannot be deleted (data integrity)
-- `weight` field is nullable — allows logging bodyweight exercises (pull-ups, push-ups)
+| Table | Key Fields | Notes |
+|---|---|---|
+| `auth_user` | id, username, email, password_hash | Django built-in; PBKDF2 hashing |
+| `tracker_exercise` | id, name, category, muscle_group, description | Shared across all users; name UNIQUE |
+| `tracker_workout` | id, user_id, name, date, notes | Per-user; CASCADE on user delete |
+| `tracker_workoutentry` | id, workout_id, exercise_id, sets, reps, weight, notes | weight nullable for bodyweight exercises |
+| `tracker_personalrecord` | id, user_id, exercise_id, best_weight, best_reps, est_1rm, achieved_date | One record per user+exercise; upserted on save |
+| `tracker_bodyweightentry` | id, user_id, date, weight | Daily weigh-ins |
+| `tracker_dailynote` | id, user_id, date, content, mood | One note per user per date |
+| `tracker_workouttemplate` | id, user_id, name, notes | Named template per user |
+| `tracker_workouttemplatem item` | id, template_id, exercise_id, sets, reps, notes | Exercises within a template |
 
 ---
 
 ## Security Features
 
-| Feature | Implementation | Details |
-|---|---|---|
-| **Secret Key** | Environment variable (`SECRET_KEY`) | Never stored in source code; unique per environment |
-| **Debug Mode** | Environment variable (`DEBUG`) | Defaults to `False` in production; `True` only in local development |
-| **Database URL** | Environment variable (`DATABASE_URL`) | Set automatically by Heroku; never hardcoded |
-| **CSRF Protection** | Django middleware (`CsrfViewMiddleware`) | All POST, PUT, PATCH, DELETE requests require CSRF token |
-| **Password Hashing** | Django PBKDF2 hasher | Plaintext passwords never stored; salted hash with 600,000 iterations |
-| **Login Required** | `@login_required` decorator | All authenticated views redirect unauthenticated users to `/login/` |
-| **Object-Level Auth** | Query filter in all views | `Workout.objects.filter(user=request.user)` ensures users cannot access others' data |
-| **404 on Unauthorized Access** | `get_object_or_404(Workout, pk=pk, user=request.user)` | Attempting to access another user's workout returns HTTP 404 |
-| **.env in .gitignore** | Git configuration | Local secrets file never committed to version control |
-| **ALLOWED_HOSTS** | Environment variable | Prevents Host header attacks; restricts requests to trusted domains |
-| **CSRF Trusted Origins** | Environment variable | Restricts cross-origin POST requests to trusted domains |
+| Feature | Implementation |
+|---|---|
+| **Secret Key** | Environment variable — never in source code |
+| **Debug Mode** | Env var; defaults `False` in production |
+| **CSRF Protection** | Django `CsrfViewMiddleware` on all POST requests |
+| **Password Hashing** | PBKDF2 with salt; plaintext never stored |
+| **Password Reset** | Django's built-in token-based flow via email |
+| **Login Required** | `@login_required` on all authenticated views |
+| **Object-Level Auth** | All queries filtered by `user=request.user`; other users' data returns 404 |
+| **SQL Injection** | Django ORM parameterised queries throughout |
+| **`.env` in `.gitignore`** | Secrets never committed |
+| **ALLOWED_HOSTS** | Prevents Host header attacks |
+| **CSRF Trusted Origins** | Restricts cross-origin POST to trusted domains |
 
 ---
 
@@ -366,122 +373,87 @@ Exercise (Shared Library)
 
 ### Manual Testing
 
-All tests below were performed manually by interacting with the application as a user would, verifying that expected behaviors occur.
-
 #### Authentication Tests
 
-| ID | Feature | Action | Expected Result | Actual Result | Status |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| AT-01 | Registration | Fill in registration form with valid data (username, email, password) | Account created; user redirected to dashboard | Account created successfully | ✅ Pass |
-| AT-02 | Registration | Attempt to register with duplicate username | Error message shown: "Username already exists" | Error message displayed | ✅ Pass |
-| AT-03 | Registration | Attempt to register with weak password (< 8 chars) | Form validation error shown | Validation error shown | ✅ Pass |
-| AT-04 | Login | Login with correct username and password | User redirected to dashboard | Redirected correctly | ✅ Pass |
-| AT-05 | Login | Login with incorrect password | Error message: "Invalid username or password" | Error message displayed | ✅ Pass |
-| AT-06 | Access Control | Attempt to access `/dashboard/` while logged out | Redirected to `/login/` | Redirected correctly | ✅ Pass |
-| AT-07 | Logout | Click "Logout" button | Session cleared; redirected to login page | Logged out successfully | ✅ Pass |
+| ID | Feature | Action | Expected Result | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| AT-01 | Registration | Register with valid data | Account created; redirect to dashboard | ✅ Pass |
+| AT-02 | Registration | Duplicate username | Error: "Username already exists" | ✅ Pass |
+| AT-03 | Registration | Weak password | Validation error shown | ✅ Pass |
+| AT-04 | Login | Correct credentials | Redirect to dashboard | ✅ Pass |
+| AT-05 | Login | Wrong password | Error message shown | ✅ Pass |
+| AT-06 | Access Control | Access `/dashboard/` logged out | Redirect to `/login/` | ✅ Pass |
+| AT-07 | Logout | Click Logout | Session cleared; redirect to login | ✅ Pass |
+| AT-08 | Password Reset | Submit registered email | Redirect to done page; email sent | ✅ Pass |
+| AT-09 | Password Reset | Submit unknown email | Same redirect (no enumeration) | ✅ Pass |
+| AT-10 | Password Reset | Follow token link | Set new password form shown | ✅ Pass |
 
 #### Workout Tests
 
-| ID | Feature | Action | Expected Result | Actual Result | Status |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| WT-01 | Create | Fill out workout form (name, date) and click "Create Workout" | Workout saved; user redirected to workout detail page | Workout created successfully | ✅ Pass |
-| WT-02 | Create | Submit workout form with empty name field | Form validation error shown: "Name is required" | Validation error shown | ✅ Pass |
-| WT-03 | Read | Click on a workout from the dashboard list | Workout detail page displays all exercises and stats | Detail page loads correctly | ✅ Pass |
-| WT-04 | Read | Attempt to access another user's workout via direct URL | HTTP 404 page displayed | 404 returned | ✅ Pass |
-| WT-05 | Update | Edit workout name and click "Save" | Name updated; success flash message shown | Update successful | ✅ Pass |
-| WT-06 | Delete | Click "Delete" button on a workout | Confirmation modal appears; after confirmation, workout removed from list | Workout deleted successfully | ✅ Pass |
+| ID | Feature | Action | Expected Result | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| WT-01 | Create | Submit workout with inline exercises | Workout + entries saved; redirect to detail | ✅ Pass |
+| WT-02 | Create | Submit with empty name | Validation error | ✅ Pass |
+| WT-03 | Read | Click workout from list | Detail page shows all entries | ✅ Pass |
+| WT-04 | Read | Access another user's workout URL | 404 returned | ✅ Pass |
+| WT-05 | Update | Edit workout name | Name updated; flash message shown | ✅ Pass |
+| WT-06 | Delete | Delete workout | Workout removed; redirect to list | ✅ Pass |
 
-#### Exercise Entry Tests
+#### Progress Page Tests
 
-| ID | Feature | Action | Expected Result | Actual Result | Status |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| ET-01 | Create | Add exercise entry with sets=3, reps=8, weight=100kg | Entry appears in workout detail table with volume calculated (3×8×100 = 2400kg) | Entry created; volume calculated correctly | ✅ Pass |
-| ET-02 | Create | Add bodyweight entry (e.g., pull-ups) with no weight | Entry shows weight as "BW"; volume shows "—" (not applicable) | Entry created; BW handled correctly | ✅ Pass |
-| ET-03 | Create | Submit entry form with empty exercise name | Form validation error shown | Validation error shown | ✅ Pass |
-| ET-04 | Update | Edit entry reps from 8 to 10 | Updated value shown in table; volume recalculated (3×10×100 = 3000kg) | Update successful; volume recalculated | ✅ Pass |
-| ET-05 | Delete | Click "Delete" on an exercise entry | Entry removed from workout detail table | Entry deleted successfully | ✅ Pass |
-
-#### Exercise Library Tests
-
-| ID | Feature | Action | Expected Result | Actual Result | Status |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| EX-01 | Browse | Navigate to Exercise Library page | All exercises displayed in a table with name, category, muscle group | Library displays all exercises | ✅ Pass |
-| EX-02 | Create | Add a new custom exercise | Exercise appears in library and is available for selection in future workouts | Exercise created successfully | ✅ Pass |
-| EX-03 | Create | Attempt to add duplicate exercise name | Error message: "Exercise with this name already exists" | Duplicate error shown | ✅ Pass |
-| EX-04 | Filter | Filter exercises by category (e.g., "Chest") | Only exercises with category "Chest" displayed | Filter works correctly | ✅ Pass |
-| EX-05 | Delete | Attempt to delete an exercise used in a previous workout | Error message: "Cannot delete exercise in use" | Deletion prevented; error shown | ✅ Pass |
-
-#### Dashboard Tests
-
-| ID | Feature | Action | Expected Result | Actual Result | Status |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| DB-01 | Stats | Log multiple workouts and exercises | Dashboard displays correct counts: total workouts, total sets, total volume | Stats calculated correctly | ✅ Pass |
-| DB-02 | Stats | Add workout with 5 exercises at 100kg each, 3 sets each | Total volume should be 5 × 3 × 100 = 1500kg | Volume calculated correctly | ✅ Pass |
-| DB-03 | Navigation | Click "New Workout" button | Redirected to workout creation form | Navigation works | ✅ Pass |
+| ID | Feature | Action | Expected Result | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| PP-01 | Stat cards | Load progress page | 4 stat cards visible with correct values | ✅ Pass |
+| PP-02 | Date filter | Click "30d" | All charts update to last 30 days | ✅ Pass |
+| PP-03 | Freq chart | Toggle Weekly/Monthly | Chart re-renders with correct grouping | ✅ Pass |
+| PP-04 | Exercise chart | Select an exercise | Est. 1RM line + sets bar chart renders | ✅ Pass |
+| PP-05 | Bodyweight chart | Log 7+ weights | Moving average dashed line appears | ✅ Pass |
 
 #### Responsiveness Tests
 
-| ID | Feature | Viewport | Action | Expected Result | Actual Result | Status |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| RES-01 | Mobile | 375px (iPhone SE) | View workout list | List displays single column; no horizontal overflow | Layout reflows correctly | ✅ Pass |
-| RES-02 | Mobile | 375px | Submit workout form on mobile | Form is readable; buttons are large enough to tap (min 44px) | Form usable on mobile | ✅ Pass |
-| RES-03 | Tablet | 768px (iPad) | View dashboard | Layout adjusts to tablet width; 2-column grid used | Layout adapts correctly | ✅ Pass |
-| RES-04 | Desktop | 1920px | View dashboard | Layout remains centered; no awkward stretching | Layout displays correctly | ✅ Pass |
+| ID | Viewport | Expected Result | Status |
+| :--- | :--- | :--- | :--- |
+| RES-01 | 375px (mobile) | Single-column layout; no overflow | ✅ Pass |
+| RES-02 | 768px (tablet) | 2-column grid; charts readable | ✅ Pass |
+| RES-03 | 1200px+ (desktop) | Full layout; stat cards in row | ✅ Pass |
 
 ### Automated Testing
 
-Automated tests cover core business logic and model behavior.
-
 ```bash
-# Run all tests
+# Run with pytest (recommended)
+.venv\Scripts\python.exe -m pytest
+
+# Run with Django test runner
 python manage.py test
 
-# Run all tests in the tests module
-python manage.py test tests
-
-# Run a specific test class
+# Specific class
 python manage.py test tests.test_fittrack.WorkoutCRUDTests
 
-# Run with verbose output
+# Verbose
 python manage.py test --verbosity=2
-
-# Alternatively, run with pytest
-pytest
 ```
 
 **Test Suite Coverage:**
-- Exercise model: `__str__`, alphabetical ordering, unique name constraint
-- Workout model: `__str__`, `total_volume()` (with entries, bodyweight excluded, empty), `entry_count()`
-- WorkoutEntry model: `volume()` with weight and bodyweight (None)
-- Form validation: WorkoutForm, ExerciseForm, RegisterForm (required fields, password matching)
-- Authentication views: register, login, logout, unauthenticated redirect
-- Workout CRUD views: create, list, detail, edit, delete, access control (404 for other user's workout)
-- WorkoutEntry CRUD views: add, edit, delete entries
-- Exercise library views: create, list, filter, edit, delete (unused and PROTECT-blocked)
-- Dashboard: page load, username display, stats with data
+- Exercise model: `__str__`, ordering, unique constraint
+- Workout model: `__str__`, volume calculation, entry count
+- WorkoutEntry model: volume with/without weight
+- Form validation: WorkoutForm, ExerciseForm, RegisterForm
+- Authentication views: register, login, logout, redirect
+- Workout CRUD views: create (with formset), list, detail, edit, delete, access control
+- WorkoutEntry CRUD: add, edit, delete
+- Exercise library: create, list, filter, edit, delete (used/unused)
+- Dashboard: load, stats, username display
 
 ### Test Results
-
-#### Manual Tests
-
-| Area | Pass | Fail | Coverage |
-| :--- | :---: | :---: | :---: |
-| Authentication | 7 | 0 | 100% |
-| Workouts (CRUD) | 6 | 0 | 100% |
-| Exercise Entries (CRUD) | 5 | 0 | 100% |
-| Exercise Library | 5 | 0 | 100% |
-| Dashboard | 3 | 0 | 100% |
-| Responsiveness | 4 | 0 | 100% |
-| **Total** | **30** | **0** | **100%** |
 
 #### Automated Tests
 
 | Area | Tests | Pass | Fail |
 | :--- | :---: | :---: | :---: |
 | Authentication (views + forms) | 9 | 9 | 0 |
-| Workouts (models + forms + CRUD views) | 14 | 14 | 0 |
-| Exercise Entries (models + CRUD views) | 5 | 5 | 0 |
-| Exercise Library (models + forms + CRUD views) | 11 | 11 | 0 |
+| Workouts (models + forms + CRUD) | 14 | 14 | 0 |
+| Exercise Entries (models + CRUD) | 5 | 5 | 0 |
+| Exercise Library (models + forms + CRUD) | 11 | 11 | 0 |
 | Dashboard | 3 | 3 | 0 |
 | **Total** | **42** | **42** | **0** |
 
@@ -489,53 +461,37 @@ pytest
 
 ## Validation
 
-### Python / Django Validation
+### Python / Django
 
-The project uses Django's built-in validation system and adheres to PEP 8 style guidelines.
+- All `ModelForm` subclasses validate required fields, unique constraints, and custom logic
+- All database queries use Django ORM parameterised queries (no raw SQL)
+- All views protected by `@login_required` or `LoginRequiredMixin`
 
-- **Form Validation**: All `ModelForm` subclasses validate required fields, unique constraints, and custom validation logic
-- **Model Validation**: `full_clean()` is called before saving all model instances
-- **URL Routing**: All views are explicitly defined in `urls.py` with named patterns for reverse URL resolution
-- **ORM Security**: All database queries use Django ORM parameterized queries to prevent SQL injection
+### HTML5
 
-**Validation checks performed:**
-- ✅ All required fields enforced (username, password, workout name, exercise name)
-- ✅ Unique constraints enforced (username, email, exercise name)
-- ✅ Foreign key relationships validated (exercise must exist before adding entry)
-- ✅ Numeric validation (sets, reps, weight must be positive integers/decimals)
+- Proper use of semantic elements (`<nav>`, `<main>`, `<form>`, `<label>`)
+- All inputs have associated `<label>` elements
+- Correct heading hierarchy throughout
 
-### HTML5 Validation
+### CSS3
 
-All HTML templates use semantic HTML5 elements and pass W3C validation.
+- Custom CSS with CSS variables; no third-party framework
+- CSS Grid and Flexbox for layouts
+- Media queries at 768px, 900px, 1100px, 1300px breakpoints
+- All CSS variables defined in `:root`
 
-- ✅ Proper use of `<form>`, `<input>`, `<label>`, `<button>` elements
-- ✅ All inputs have associated `<label>` elements
-- ✅ Proper heading hierarchy (`<h1>`, `<h2>`, `<h3>`)
-- ✅ Semantic structural elements (`<header>`, `<main>`, `<nav>`, `<footer>`)
+### Accessibility (WCAG 2.1 AA)
 
-### CSS3 Validation
-
-The stylesheet follows modern CSS3 standards and responsive design principles.
-
-- ✅ Uses CSS Grid and Flexbox for layouts
-- ✅ Media queries for responsive breakpoints (mobile, tablet, desktop)
-- ✅ Color contrast meets WCAG AA standards (4.5:1 minimum for normal text)
-- ✅ Font sizes use `rem` units for accessibility
-
-### Accessibility Compliance
-
-**WCAG 2.1 AA Compliance:**
-
-| Criterion | Implementation | Verified | Result |
-| :--- | :--- | :--- | :---: |
-| Semantic HTML structure | `<header>`, `<main>`, `<nav>`, `<footer>`, `<form>`, `<label>` used throughout | Manual review | ✅ |
-| Keyboard navigation | Tab navigates all form inputs; Enter submits forms | Manual keyboard-only test | ✅ |
-| Form labels | All inputs have associated `<label>` with `for` attribute | HTML validation | ✅ |
-| Alt text on images | All images include descriptive alt text | Manual review | ✅ |
-| Colour contrast | Minimum 4.5:1 ratio on all text | WCAG Contrast Checker | ✅ |
-| Focus indicators | Visible focus ring on all focusable elements | Manual test | ✅ |
-| Error messages | Validation errors are descriptive and contextual | Manual test (AT-02, AT-03, WT-02) | ✅ |
-| Responsive design | Mobile, tablet, desktop layouts all accessible | Manual test (RES-01, RES-02, RES-03) | ✅ |
+| Criterion | Status |
+| :--- | :---: |
+| Semantic HTML structure | ✅ |
+| Keyboard navigation | ✅ |
+| Form labels on all inputs | ✅ |
+| `sr-only` descriptions on charts | ✅ |
+| ARIA labels on interactive controls | ✅ |
+| Colour contrast ≥ 4.5:1 | ✅ |
+| Focus indicators visible | ✅ |
+| Responsive design (mobile/tablet/desktop) | ✅ |
 
 ---
 
@@ -546,115 +502,90 @@ The stylesheet follows modern CSS3 standards and responsive design principles.
 | Field | Detail |
 | :--- | :--- |
 | **ID** | BUG-01 |
-| **Issue** | Users with hundreds of workouts will see all of them on one page, potentially causing slow page load and poor user experience. |
-| **Potential Impact** | Performance degradation for users with > 500 workouts |
-| **Resolution** | Implement Django pagination with 20 workouts per page; add "Next" and "Previous" navigation |
-| **Status** | ⏳ Planned (future improvement) |
-
----
+| **Issue** | Users with hundreds of workouts see all of them on one page, causing slow load times. |
+| **Resolution** | Implement Django pagination with 20 workouts per page |
+| **Status** | ⏳ Planned |
 
 #### Bug 2 — Exercise Library is Shared Across All Users
 
 | Field | Detail |
 | :--- | :--- |
 | **ID** | BUG-02 |
-| **Issue** | The Exercise model has no `user` field, meaning all users share the same exercise library. Custom exercises added by one user are visible to all users. |
-| **Potential Impact** | May cause confusion; custom exercises not discoverable per user |
-| **Resolution** | Add optional `user` FK to Exercise model; scope library queries by user while providing a fallback to global exercises |
-| **Status** | ⏳ Planned (future improvement) |
-
----
-
-#### Bug 3 — No Workout Templates or Pre-Filled Programs
-
-| Field | Detail |
-| :--- | :--- |
-| **ID** | BUG-03 |
-| **Issue** | Users must manually create each workout from scratch; there is no way to clone previous workouts or use pre-defined training programs. |
-| **Potential Impact** | Friction for users following structured programs (e.g., 5/3/1, PPL) who log similar workouts repeatedly |
-| **Resolution** | Add "Clone Workout" feature; implement workout templates with pre-defined exercises |
-| **Status** | ⏳ Planned (future improvement) |
+| **Issue** | All users share one exercise library; custom exercises added by one user are visible to all. |
+| **Resolution** | Add optional `user` FK to Exercise; scope queries per user with global fallback |
+| **Status** | ⏳ Planned |
 
 ---
 
 ## Future Improvements
 
-Potential enhancements to increase user value and engagement:
-
-1. **Workout Pagination** — Implement Django pagination to handle users with large workout histories efficiently
-2. **User-Scoped Exercise Library** — Allow users to create personal exercises alongside a global shared library
-3. **Workout Templates / Cloning** — Enable users to quickly clone previous workouts or create reusable templates (e.g., "Push Day", "Leg Day")
-4. **Progress Charts & Graphs** — Visualize progression over time using Chart.js or similar (e.g., max weight lifted, total volume trend)
-5. **Export Workout History** — Allow users to download their workout history as CSV or PDF
-6. **Mobile App** — Build a native or React Native mobile app for offline logging with sync
-7. **Social Features** — Optionally share workout summaries with friends or join workout challenges
-8. **Workout Analytics** — Recommend when to increase weight based on rep ranges and historical performance
-9. **Recurring Workouts** — Schedule recurring workouts (e.g., "Monday = Push Day") with auto-creation
-10. **API Layer** — Expose a REST API for third-party integrations and mobile app support
+1. **Workout Pagination** — Handle large workout histories efficiently
+2. **User-Scoped Exercise Library** — Personal exercises alongside a global shared library
+3. **Workout Cloning** — Duplicate a past workout as a new session
+4. **Mobile App** — Native or React Native app with offline sync
+5. **Social Features** — Optionally share workout summaries or join challenges
+6. **REST API** — Expose endpoints for third-party integrations
 
 ---
 
 ## Project Structure
 
 ```
-fittrack/
-├── fittrack/                          # Django project configuration
-│   ├── settings.py                    # All settings (database, auth, middleware, etc.)
+fitness-tracker/
+├── fittrack/                          # Django project config
+│   ├── settings.py                    # All settings (DB, auth, email, middleware)
 │   ├── urls.py                        # Root URL dispatcher
-│   ├── wsgi.py                        # WSGI entry point (Heroku/gunicorn)
-│   └── __init__.py
+│   └── wsgi.py                        # WSGI entry point
 │
-├── tracker/                           # Main application (models, views, forms)
-│   ├── models.py                      # Exercise, Workout, WorkoutEntry models
-│   ├── views.py                       # All view functions (CRUD operations)
-│   ├── forms.py                       # Django forms with custom validation
-│   ├── urls.py                        # App URL patterns
-│   ├── admin.py                       # Django admin site registration
-│   ├── apps.py                        # App configuration
-│   ├── __init__.py
-│   ├── templates/tracker/             # HTML templates for all pages
-│   │   ├── login.html                 # User login page
-│   │   ├── register.html              # User registration page
-│   │   ├── dashboard.html             # Main dashboard with stats
-│   │   ├── workout_list.html          # List of user's workouts
-│   │   ├── workout_detail.html        # Workout detail + exercise entries table
-│   │   ├── workout_form.html          # Create/edit workout form
-│   │   ├── entry_form.html            # Create/edit exercise entry form
-│   │   ├── exercise_list.html         # Browse and filter exercise library
-│   │   ├── exercise_form.html         # Create/edit custom exercise form
-│   │   └── confirm_delete.html        # Generic confirmation modal
-│   │
-│   ├── management/
-│   │   ├── __init__.py
-│   │   └── commands/
-│   │       ├── __init__.py
-│   │       └── seed_exercises.py      # Custom command: python manage.py seed_exercises
-│   │
-│   ├── migrations/
-│   │   ├── __init__.py
-│   │   ├── 0001_initial.py            # Initial schema
-│   │   └── ...
-│   │
-└── static/
-    └── css/
-        └── styles.css                 # All custom CSS (Bootstrap overrides, utilities)
+├── tracker/                           # Main application
+│   ├── models.py                      # All models + WorkoutManager (streak)
+│   ├── views.py                       # All views (FBV + CBV)
+│   ├── forms.py                       # Forms + WorkoutEntryFormSet
+│   ├── urls.py                        # App URL patterns (incl. password reset)
+│   ├── admin.py                       # Admin registrations
+│   └── templates/tracker/
+│       ├── dashboard.html
+│       ├── login.html
+│       ├── register.html
+│       ├── workout_list.html
+│       ├── workout_detail.html
+│       ├── workout_form.html          # Create (inline formset) + edit
+│       ├── entry_form.html
+│       ├── exercise_list.html
+│       ├── exercise_form.html
+│       ├── progress.html              # Charts + stat cards
+│       ├── bodyweight.html
+│       ├── notes.html
+│       ├── profile.html
+│       ├── template_list.html
+│       ├── template_form.html
+│       ├── template_detail.html
+│       └── confirm_delete.html
 │
 ├── templates/
-│   └── base.html                      # Shared base template (nav, footer, blocks)
+│   ├── base.html                      # Shared base (nav, footer)
+│   └── registration/                  # Django auth password reset templates
+│       ├── password_reset_form.html
+│       ├── password_reset_done.html
+│       ├── password_reset_confirm.html
+│       └── password_reset_complete.html
+│
+├── static/
+│   └── css/
+│       └── styles.css                 # Arctic Blue dark theme (CSS variables)
 │
 ├── tests/
-│   ├── __init__.py
-│   └── test_fittrack.py               # Full automated test suite
+│   └── test_fittrack.py               # 42 automated tests
 │
-├── .env.example                       # Environment variable template (no secrets)
-├── .gitignore                         # Git ignore rules (includes .env, venv, __pycache__)
-├── conftest.py                        # Pytest configuration (if using pytest)
-├── manage.py                          # Django CLI entry point
-├── Procfile                           # Heroku process file (release, web commands)
-├── pytest.ini                         # Pytest configuration
-├── requirements.txt                   # Python package dependencies
-├── runtime.txt                        # Python version for Heroku (3.12.x)
-└── README.md                          # This file
+├── .env.example                       # Environment variable template
+├── .gitignore
+├── .python-version                    # Python 3.12 (Heroku)
+├── conftest.py                        # pytest-django config
+├── manage.py
+├── Procfile                           # Heroku release + web commands
+├── pytest.ini
+├── requirements.txt
+└── README.md
 ```
 
 ---
@@ -663,61 +594,51 @@ fittrack/
 
 ### Libraries & Frameworks
 
-#### Django
-Django 4.2 is the core web framework, providing routing, ORM, user authentication, templating, and form handling.
+**Django 4.2** — Web framework (routing, ORM, auth, templates, password reset)
+https://www.djangoproject.com/
 
-**Used in:** `fittrack/`, `tracker/` (all modules)  
-**Attribution:** Django Project — https://www.djangoproject.com/
+**PostgreSQL** — Relational database providing ACID compliance, foreign key constraints, and scalability
+https://www.postgresql.org/
 
-#### PostgreSQL
-PostgreSQL is the production database providing ACID compliance, foreign key constraints, and scalability.
+**Bootstrap 5.3** — Responsive grid, components (buttons, modals, forms), and utility classes
+https://getbootstrap.com/
 
-**Used in:** Production environment (Heroku PostgreSQL addon)  
-**Attribution:** PostgreSQL — https://www.postgresql.org/
+**Chart.js 4.4.0** — Interactive canvas charts (frequency, bodyweight, exercise progress)
+https://www.chartjs.org/
 
-#### Bootstrap 5.3
-Bootstrap provides responsive grid, components (buttons, modals, forms), and utility classes for rapid UI development.
+**psycopg2** — PostgreSQL adapter for Python
+https://www.psycopg.org/
 
-**Used in:** `templates/base.html`, all HTML templates  
-**Attribution:** Bootstrap — https://getbootstrap.com/
+**gunicorn** — Production WSGI server
+https://gunicorn.org/
 
-#### Google Fonts
-Google Fonts provides free, open-source typography.
+**WhiteNoise** — Static file serving in production without a separate CDN
+https://whitenoise.readthedocs.io/
 
-**Used in:** `static/css/styles.css` (`font-family: 'Bebas Neue', 'DM Sans'`)  
-**Attribution:** Google Fonts — https://fonts.google.com/
+**python-dotenv** — `.env` loading for local development
+https://github.com/theskumar/python-dotenv
 
-#### WhiteNoise
-WhiteNoise serves static files in production without requiring a separate CDN or web server configuration.
+**dj-database-url** — `DATABASE_URL` parsing
+https://github.com/jazzband/dj-database-url
 
-**Used in:** `fittrack/settings.py` (middleware)  
-**Attribution:** WhiteNoise — https://whitenoise.readthedocs.io/
+**Google Fonts** — Roboto (body and display typography)
+https://fonts.google.com/
 
-#### python-dotenv
-python-dotenv loads environment variables from a `.env` file during local development.
+### Deployment
 
-**Used in:** Local development environment  
-**Attribution:** python-dotenv — https://github.com/theskumar/python-dotenv
+**Heroku** — Cloud hosting + PostgreSQL
+https://www.heroku.com/
 
-### Deployment Platforms
+**Resend** — Transactional email for password reset
+https://resend.com/
 
-#### Heroku
-Heroku is a cloud platform that hosts the application, provides PostgreSQL, and automates deployments.
+### References
 
-**Attribution:** Heroku — https://www.heroku.com/
+**Django Documentation** — https://docs.djangoproject.com/
 
-### Development Tools
-
-#### Django Documentation
-Official Django documentation for models, views, forms, authentication, and testing.
-
-**Attribution:** Django Project — https://docs.djangoproject.com/
-
-#### MDN Web Docs
-MDN Web Docs provides authoritative documentation for HTML5, CSS3, and JavaScript standards.
-
-**Attribution:** Mozilla Developer Network — https://developer.mozilla.org/
+**MDN Web Docs** — HTML5, CSS3, JavaScript
+https://developer.mozilla.org/
 
 ---
 
-**FitTrack © 2025 — Built with Django, PostgreSQL, and Bootstrap**
+**FitTrack © 2026 — Built with Django, PostgreSQL, and Chart.js**
