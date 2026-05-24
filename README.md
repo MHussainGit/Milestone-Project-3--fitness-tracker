@@ -44,6 +44,7 @@ A full-stack web application designed to help gym-goers log workouts, track exer
   - [Libraries & Frameworks](#libraries--frameworks-1)
   - [Deployment & Services](#deployment--services)
   - [References](#references)
+  - [Images](#images)
 
 ---
 
@@ -1086,6 +1087,17 @@ Specific standard features referenced:
 - **`<canvas>`** — The HTML element that Chart.js renders all charts into; `aria-label` and `role` attributes applied as per MDN guidance
 
 - Attribution: MDN Web Docs — https://developer.mozilla.org/
+
+---
+
+### Images
+
+#### Favicon
+Dumbbell icon used as the browser favicon across all pages.
+
+Found in: `templates/base.html` (`<link rel="icon">` in `<head>`), served from `static/assets/dumbbell.png`.
+
+- Attribution: [Dumbbell icons created by jono - Flaticon](https://www.flaticon.com/free-icons/dumbbell)
 
 ---
 
