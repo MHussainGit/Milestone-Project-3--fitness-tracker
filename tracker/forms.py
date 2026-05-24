@@ -47,7 +47,7 @@ class WorkoutForm(StyledFormMixin, forms.ModelForm):
         fields = ('name', 'date', 'notes')
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': 'e.g. Push Day'}),
-            'date': forms.DateInput(attrs={'type': 'date'}),
+            'date': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
             'notes': forms.Textarea(attrs={'rows': 2}),
         }
 
@@ -98,7 +98,7 @@ class BodyWeightForm(StyledFormMixin, forms.ModelForm):
         model = BodyWeightEntry
         fields = ('date', 'weight', 'notes')
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'}),
+            'date': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
             'weight': forms.NumberInput(attrs={'min': 0.1, 'step': '0.1', 'placeholder': 'kg'}),
             'notes': forms.TextInput(attrs={'placeholder': 'Optional note'}),
         }
@@ -109,7 +109,7 @@ class DailyNoteForm(StyledFormMixin, forms.ModelForm):
         model = DailyNote
         fields = ('date', 'mood', 'content')
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'}),
+            'date': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
             'mood': forms.Select(),
             'content': forms.Textarea(attrs={'rows': 3, 'placeholder': 'How did you feel today?'}),
         }
