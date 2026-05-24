@@ -30,7 +30,7 @@
   <!-- Date range filter -->
   <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1.25rem" role="group" aria-label="Date range filter">
     {% for label, val in range_options %}
-      <a href="{% url 'progress' %}?range={{ val }}&freq={{ freq_view }}{% if selected_ex_id %}&exercise={{ selected_ex_id }}{% endif %}"
+      <a href="{% url 'progress' %}?range={{ val }}&amp;freq={{ freq_view }}{% if selected_ex_id %}&amp;exercise={{ selected_ex_id }}{% endif %}"
          class="btn btn-sm {% if range_param == val %}btn-primary{% else %}btn-secondary{% endif %}">{{ label }}</a>
     {% endfor %}
   </div>

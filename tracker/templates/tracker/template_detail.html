@@ -17,7 +17,7 @@
       <div class="card" style="padding:0;overflow:hidden">
         <div class="table-scroll">
           <table class="ex-table">
-            <thead><tr><th>Exercise</th><th>Sets</th><th>Reps</th><th>Notes</th><th></th></tr></thead>
+            <thead><tr><th scope="col">Exercise</th><th scope="col">Sets</th><th scope="col">Reps</th><th scope="col">Notes</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
           <tbody>
             {% for item in items %}
             <tr>
@@ -41,7 +41,7 @@
         {% csrf_token %}
         {% for field in form %}
           <div class="form-group">
-            <label>{{ field.label }}</label>{{ field }}
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}
             {% if field.errors %}<p class="form-error">{{ field.errors.0 }}</p>{% endif %}
           </div>
         {% endfor %}
