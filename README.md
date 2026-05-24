@@ -17,6 +17,7 @@ A full-stack web application designed to help gym-goers log workouts, track exer
   - [Design Rationale](#design-rationale)
   - [Accessibility Considerations](#accessibility-considerations)
 - [User Stories](#user-stories)
+- [Skeleton](#skeleton)
 - [Screenshots](#screenshots)
 - [Features](#features)
 - [Technology Stack](#technology-stack)
@@ -155,6 +156,24 @@ FitTrack addresses the needs of gym users who require a fast, reliable logging t
 6. **As a privacy-conscious user**, I want my workout data stored securely in my own account so that it is not shared with third parties or visible to other users.
 
 7. **As a user who forgot their password**, I want to request a reset link by email so that I am not permanently locked out of my account.
+
+---
+
+## Skeleton
+
+The website wireframes were created using Balsamiq and can be viewed below.
+
+### Desktop Wireframes:
+#### Design layout for the desktop version of the home page
+#### ![Desktop - Home](<assets/images/Desktop - Home.png>)
+#### Design layout for the desktop version of the popular destinations page
+#### ![Desktop - Popular Destinations](<assets/images/Desktop - Popular Destinations.png>)
+
+### Mobile Wireframes:
+#### Design layout for the mobile version of the home page
+#### ![Mobile - Home](<assets/images/Mobile - Home.png>)
+#### Design layout for the mobile version of the popular destinations page
+#### ![Mobile - Popular Destinations](<assets/images/Mobile - Popular Destinations.png>)
 
 ---
 
