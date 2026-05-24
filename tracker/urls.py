@@ -1,5 +1,6 @@
 """tracker URL patterns."""
 from django.urls import path
+from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
@@ -49,4 +50,18 @@ urlpatterns = [
     # User profile
     path('profile/',         views.profile,        name='profile'),
     path('profile/delete/',  views.profile_delete, name='profile_delete'),
+
+    # Password reset
+    path('password-reset/',
+         auth_views.PasswordResetView.as_view(extra_context={'title': 'Reset Password'}),
+         name='password_reset'),
+    path('password-reset/done/',
+         auth_views.PasswordResetDoneView.as_view(),
+         name='password_reset_done'),
+    path('password-reset/<uidb64>/<token>/',
+         auth_views.PasswordResetConfirmView.as_view(extra_context={'title': 'Set New Password'}),
+         name='password_reset_confirm'),
+    path('password-reset/complete/',
+         auth_views.PasswordResetCompleteView.as_view(),
+         name='password_reset_complete'),
 ]

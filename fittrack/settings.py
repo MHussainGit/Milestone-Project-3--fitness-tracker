@@ -129,6 +129,18 @@ STORAGES = {
     'staticfiles': {'BACKEND': _static_backend},
 }
 
+# ── Email ──────────────────────────────────────────────────────────────────
+# Locally falls back to console (prints to terminal). On Heroku set:
+#   EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+#   EMAIL_HOST / EMAIL_PORT / EMAIL_HOST_USER / EMAIL_HOST_PASSWORD
+EMAIL_BACKEND       = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST          = os.environ.get('EMAIL_HOST', 'smtp.sendgrid.net')
+EMAIL_PORT          = int(os.environ.get('EMAIL_PORT', '587'))
+EMAIL_USE_TLS       = True
+EMAIL_HOST_USER     = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL  = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@fittrack.app')
+
 # ── Misc ───────────────────────────────────────────────────────────────────
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
