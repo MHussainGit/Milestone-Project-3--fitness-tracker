@@ -409,7 +409,7 @@ def entry_edit(request, workout_pk, pk):
         form = WorkoutEntryForm(request.POST, instance=entry)
         if form.is_valid():
             entry = form.save()
-            _update_personal_record(request.user, entry, workout)
+            _recalculate_personal_record(request.user, entry.exercise)
             messages.success(request, 'Exercise updated.')
             return redirect('workout_detail', pk=workout.pk)
     else:
