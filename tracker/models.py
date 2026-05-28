@@ -58,9 +58,15 @@ class WorkoutQuerySet(models.QuerySet):
     def streak(self, reference_date=None):
         reference_date = reference_date or timezone.localdate()
         workout_dates = set(self.values_list('date', flat=True))
-        streak = 0
-        current_date = reference_date
 
+        if reference_date in workout_dates:
+            current_date = reference_date
+        elif (reference_date - timedelta(days=1)) in workout_dates:
+            current_date = reference_date - timedelta(days=1)
+        else:
+            return 0
+
+        streak = 0
         while current_date in workout_dates:
             streak += 1
             current_date -= timedelta(days=1)

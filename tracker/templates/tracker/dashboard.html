@@ -6,7 +6,7 @@
     <div class="hero__label">Welcome back</div>
     <h1 class="hero__title">{{ user.username }}</h1>
     <div class="hero__meta">Current month: {{ current_month }}</div>
-    {% if streak > 0 %}
+    {% if streak >= 3 %}
       <div class="streak-badge" aria-label="{{ streak }} day streak">
         <span aria-hidden="true">🔥</span> {{ streak }}-day streak
       </div>
