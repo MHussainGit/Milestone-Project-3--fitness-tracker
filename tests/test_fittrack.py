@@ -406,16 +406,16 @@ class ExerciseCRUDTests(TestCase):
         self.client.post(reverse('exercise_delete', args=[exercise.pk]))
         self.assertFalse(Exercise.objects.filter(pk=exercise.pk).exists())
 
-    def test_delete_exercise_in_use_blocked(self):
-        """An exercise used in a workout cannot be deleted (FK PROTECT)."""
+    def test_delete_exercise_cascades_to_entries(self):
+        """Deleting an exercise removes its workout entries (FK CASCADE)."""
         user     = User.objects.create_user(username='protectuser', password='prot99!')
         exercise = Exercise.objects.create(name='Protected', category='strength')
         workout  = Workout.objects.create(user=user, name='W', date=date.today())
-        WorkoutEntry.objects.create(workout=workout, exercise=exercise, sets=1, reps=1)
+        entry    = WorkoutEntry.objects.create(workout=workout, exercise=exercise, sets=1, reps=1)
 
         self.client.post(reverse('exercise_delete', args=[exercise.pk]))
-        # Exercise must still exist
-        self.assertTrue(Exercise.objects.filter(pk=exercise.pk).exists())
+        self.assertFalse(Exercise.objects.filter(pk=exercise.pk).exists())
+        self.assertFalse(WorkoutEntry.objects.filter(pk=entry.pk).exists())
 
 
 class DashboardTests(TestCase):
