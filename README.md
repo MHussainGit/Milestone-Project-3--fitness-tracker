@@ -544,6 +544,21 @@ All templates use semantic HTML5 elements and were tested using the W3C Markup V
 - ✅ Proper heading hierarchy throughout (`<h1>`, `<h2>`, `<h3>`)
 - ✅ Semantic structural elements used correctly
 
+#### W3C HTML Validation Results
+
+| Page | Result |
+| :--- | :--- |
+| Login | ![W3C HTML — Login](<assets/validation/w3c-html-login-validated.png>) |
+| Register | ![W3C HTML — Register](<assets/validation/w3c-html-register-validated.png>) |
+| Dashboard | ![W3C HTML — Dashboard](<assets/validation/w3c-html-dashboard-validated.png>) |
+| Log Workout | ![W3C HTML — Log Workout](<assets/validation/w3c-html-+log-workout-validated.png>) |
+| Workouts | ![W3C HTML — Workouts](<assets/validation/w3c-html-workouts-validated.png>) |
+| Exercises | ![W3C HTML — Exercises](<assets/validation/w3c-html-exercises-validated.png>) |
+| Progress | ![W3C HTML — Progress](<assets/validation/w3c-html-progress-validated.png>) |
+| Notes | ![W3C HTML — Notes](<assets/validation/w3c-html-notes-validated.png>) |
+| My Profile | ![W3C HTML — My Profile](<assets/validation/w3c-html-my-profile-validated.png>) |
+| Password Reset | ![W3C HTML — Password Reset](<assets/validation/w3c-html-password-reset-validated.png>) |
+
 ### CSS3
 
 All styles are hand-written in a single stylesheet using modern CSS3.
@@ -553,6 +568,10 @@ All styles are hand-written in a single stylesheet using modern CSS3.
 - ✅ CSS Grid and Flexbox for all layouts
 - ✅ Media queries at 400px, 600px, 768px, 960px, 1024px, and 1025px+ breakpoints
 - ✅ `clamp()` used for fluid typography on headings and stat values
+
+#### W3C CSS Validation Result
+
+![W3C CSS Validated](<assets/validation/w3c-css-validated.png>)
 
 **Warnings (142):** All warnings are expected and informational:
 - 140 × *"CSS variables are currently not statically checked"* — the W3C validator cannot evaluate `var()` values at parse time; this is a known limitation, not a bug
