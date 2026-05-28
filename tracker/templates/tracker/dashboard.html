@@ -32,6 +32,18 @@
       <div class="stat-card__label">Bodyweight (kg)</div>
     </div>
     {% endif %}
+    <div class="stat-card">
+      <form method="post" style="display:contents">
+        {% csrf_token %}
+        <div style="display:flex;align-items:center;gap:.4rem;justify-content:center">
+          <input type="number" name="workout_target" value="{{ workout_target }}"
+                 min="1" max="14" aria-label="Weekly workout target"
+                 style="width:52px;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:.2rem .4rem;font-size:1.5rem;font-weight:700;text-align:center">
+          <button type="submit" class="btn btn-secondary btn-sm" style="padding:.2rem .5rem">&#10003;</button>
+        </div>
+      </form>
+      <div class="stat-card__label">Weekly Target</div>
+    </div>
   </div>
 
   <!-- Quick actions -->

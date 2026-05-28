@@ -194,29 +194,69 @@ function fmtMonth(s) {
 const freqRaw    = {{ freq_labels|safe }};
 const freqData   = {{ freq_data|safe }};
 const freqView   = '{{ freq_view }}';
+const freqTarget = {{ workout_target }};
 if (freqRaw.length) {
   const freqLabels = freqRaw.map(l => freqView === 'monthly' ? fmtMonth(l) : fmtWeek(l));
+  function freqEma(data, alpha) {
+    return data.reduce((acc, val, i) => {
+      acc.push(i === 0 ? val : Math.round((alpha * val + (1 - alpha) * acc[i - 1]) * 10) / 10);
+      return acc;
+    }, []);
+  }
+  const freqEmaData = freqEma(freqData, 0.2);
   new Chart(document.getElementById('freqChart'), {
     type: 'line',
     data: {
       labels: freqLabels,
-      datasets: [{
-        label: 'Workouts',
-        data: freqData,
-        borderColor: '#ffa657',
-        backgroundColor: 'rgba(255,166,87,0.15)',
-        fill: true,
-        tension: 0.4,
-        pointRadius: 3,
-        pointHoverRadius: 5,
-      }]
+      datasets: [
+        {
+          label: 'Workouts',
+          data: freqData,
+          borderColor: '#ffa657',
+          backgroundColor: 'rgba(255,166,87,0.15)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          order: 3,
+        },
+        {
+          label: 'Trend (EMA)',
+          data: freqEmaData,
+          borderColor: '#58a6ff',
+          borderDash: [5, 4],
+          borderWidth: 2,
+          pointRadius: 0,
+          fill: false,
+          tension: 0.4,
+          order: 2,
+        },
+        {
+          label: `Target (${freqTarget}/wk)`,
+          data: freqLabels.map(() => freqTarget),
+          borderColor: '#3fb950',
+          borderDash: [3, 5],
+          borderWidth: 1.5,
+          pointRadius: 0,
+          fill: false,
+          order: 1,
+        },
+      ]
     },
     options: {
       ...chartDefaults,
       plugins: {
         ...chartDefaults.plugins,
-        legend: { display: false },
-        tooltip: { callbacks: { label: ctx => ctx.parsed.y + ' workouts' } }
+        legend: { display: true, position: 'bottom', labels: LEGEND },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              if (ctx.dataset.label.startsWith('Target')) return `Target: ${freqTarget} workouts/${freqView === 'monthly' ? 'mo' : 'wk'}`;
+              if (ctx.dataset.label === 'Trend (EMA)') return `EMA trend: ${ctx.parsed.y}`;
+              return `${ctx.parsed.y} workouts`;
+            }
+          }
+        }
       },
       scales: {
         x: xAxis(),

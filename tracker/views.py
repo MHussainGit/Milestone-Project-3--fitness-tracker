@@ -18,7 +18,7 @@ from django.views.generic import UpdateView, DeleteView
 from .models import (
     Workout, WorkoutEntry, Exercise,
     BodyWeightEntry, DailyNote, PersonalRecord,
-    WorkoutTemplate, WorkoutTemplateItem,
+    WorkoutTemplate, WorkoutTemplateItem, UserProfile,
 )
 from .forms import (
     RegisterForm, LoginForm,
@@ -101,8 +101,19 @@ def logout_view(request):
 
 @login_required
 def profile(request):
+    user_profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    if request.method == 'POST':
+        try:
+            target = int(request.POST.get('workout_target', 3))
+            user_profile.workout_target = max(1, min(target, 14))
+            user_profile.save()
+            messages.success(request, 'Workout target updated.')
+        except (ValueError, TypeError):
+            messages.error(request, 'Please enter a valid number.')
+        return redirect('profile')
     return render(request, 'tracker/profile.html', {
         'user_profile': request.user,
+        'workout_target': user_profile.workout_target,
     })
 
 
@@ -128,6 +139,18 @@ def dashboard(request):
     """
     Main dashboard — stats, recent workouts, streak, today's note, PRs.
     """
+    user_profile, _ = UserProfile.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        try:
+            target = int(request.POST.get('workout_target', 3))
+            user_profile.workout_target = max(1, min(target, 14))
+            user_profile.save()
+            messages.success(request, 'Workout target updated.')
+        except (ValueError, TypeError):
+            messages.error(request, 'Please enter a valid number.')
+        return redirect('dashboard')
+
     user_workouts = Workout.objects.filter(
         user=request.user
     ).prefetch_related('entries__exercise')
@@ -161,17 +184,18 @@ def dashboard(request):
     recent_workouts = list(user_workouts[:5])
 
     context = {
-        'recent_workouts': recent_workouts,
-        'total_workouts':  total_workouts,
-        'total_entries':   total_entries,
-        'monthly_sets':    monthly_sets,
+        'recent_workouts':  recent_workouts,
+        'total_workouts':   total_workouts,
+        'total_entries':    total_entries,
+        'monthly_sets':     monthly_sets,
         'monthly_workouts': monthly_workout_count,
-        'streak':          streak,
-        'todays_note':     todays_note,
-        'top_prs':         top_prs,
-        'current_month':   current_month,
-        'latest_bw':       latest_bw,
-        'today':           today,
+        'streak':           streak,
+        'todays_note':      todays_note,
+        'top_prs':          top_prs,
+        'current_month':    current_month,
+        'latest_bw':        latest_bw,
+        'today':            today,
+        'workout_target':   user_profile.workout_target,
     }
     return render(request, 'tracker/dashboard.html', context)
 
@@ -486,18 +510,40 @@ def progress(request):
         for workout in all_workouts:
             month_key = workout.date.strftime('%Y-%m')
             month_dict[month_key] = month_dict.get(month_key, 0) + 1
-        for month_key in sorted(month_dict.keys()):
-            freq_labels.append(month_key)
-            freq_data.append(month_dict[month_key])
+        if month_dict:
+            from datetime import date
+            keys = sorted(month_dict.keys())
+            start_y, start_m = map(int, keys[0].split('-'))
+            end_y, end_m = map(int, keys[-1].split('-'))
+            y, m = start_y, start_m
+            while (y, m) <= (end_y, end_m):
+                k = f"{y}-{m:02d}"
+                freq_labels.append(k)
+                freq_data.append(month_dict.get(k, 0))
+                m += 1
+                if m > 12:
+                    m = 1
+                    y += 1
     else:
         week_dict = {}
         for workout in all_workouts:
             iso_year, iso_week, _ = workout.date.isocalendar()
             week_key = f"{iso_year}-W{iso_week:02d}"
             week_dict[week_key] = week_dict.get(week_key, 0) + 1
-        for week_key in sorted(week_dict.keys()):
-            freq_labels.append(week_key)
-            freq_data.append(week_dict[week_key])
+        if week_dict:
+            from datetime import date, timedelta as td
+            keys = sorted(week_dict.keys())
+            def _week_start(key):
+                y, w = int(key[:4]), int(key[6:])
+                return date.fromisocalendar(y, w, 1)
+            cur = _week_start(keys[0])
+            end = _week_start(keys[-1])
+            while cur <= end:
+                iso_y, iso_w, _ = cur.isocalendar()
+                k = f"{iso_y}-W{iso_w:02d}"
+                freq_labels.append(k)
+                freq_data.append(week_dict.get(k, 0))
+                cur += td(weeks=1)
 
     # Exercise progress — user picks an exercise
     selected_ex_id = request.GET.get('exercise', '')
@@ -536,6 +582,7 @@ def progress(request):
         user=request.user
     ).select_related('exercise').order_by('-best_weight')
 
+    user_profile, _ = UserProfile.objects.get_or_create(user=request.user)
     range_options = [('30d', '30'), ('90d', '90'), ('6m', '180'), ('1y', '365'), ('All', 'all')]
 
     context = {
@@ -561,6 +608,7 @@ def progress(request):
         'selected_exercise': selected_exercise,
         'selected_ex_id':    selected_ex_id,
         'all_prs':           all_prs,
+        'workout_target':    user_profile.workout_target,
     }
     return render(request, 'tracker/progress.html', context)
 

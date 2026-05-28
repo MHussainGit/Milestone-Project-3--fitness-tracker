@@ -23,6 +23,20 @@
       </div>
     </div>
 
+    <form method="post" style="margin-top:2rem;border-top:1px solid var(--border);padding-top:1.5rem">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="workout_target" class="form-label">Weekly Workout Target</label>
+        <div style="display:flex;gap:.75rem;align-items:center;max-width:220px">
+          <input type="number" id="workout_target" name="workout_target"
+                 value="{{ workout_target }}" min="1" max="14"
+                 class="form-control" style="width:90px">
+          <button type="submit" class="btn btn-primary btn-sm">Save</button>
+        </div>
+        <small style="color:var(--muted)">How many workouts per week you aim to complete (1–14).</small>
+      </div>
+    </form>
+
     <div class="form-actions" style="margin-top: 2rem; justify-content: flex-start; gap: 1rem;">
       <a href="{% url 'profile_delete' %}" class="btn btn-danger">Delete Profile</a>
       <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
