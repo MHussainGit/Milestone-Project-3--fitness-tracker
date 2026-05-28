@@ -331,6 +331,19 @@ if (exRaw.length && document.getElementById('exChart')) {
           borderRadius: 3,
           yAxisID: 'y1',
           order: 2,
+        },
+        {
+          type: 'line',
+          label: 'Reps',
+          data: exRepsData,
+          borderColor: '#ffa657',
+          backgroundColor: 'rgba(255,166,87,0.08)',
+          tension: 0.3,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          borderWidth: 2,
+          yAxisID: 'y1',
+          order: 1,
         }
       ]
     },
@@ -340,14 +353,6 @@ if (exRaw.length && document.getElementById('exChart')) {
       plugins: {
         ...chartDefaults.plugins,
         legend: { display: true, position: 'bottom', labels: LEGEND },
-        tooltip: {
-          callbacks: {
-            afterBody: ctx => {
-              const i = ctx[0].dataIndex;
-              return [`Reps: ${exRepsData[i]}`];
-            }
-          }
-        }
       },
       scales: {
         x: xAxis({ ticks: { ...TICK, maxTicksLimit: 10 } }),
@@ -356,7 +361,7 @@ if (exRaw.length && document.getElementById('exChart')) {
           position: 'right',
           ticks: { ...TICK, stepSize: 1 },
           grid: { drawOnChartArea: false },
-          title: axisTitle('Sets'),
+          title: axisTitle('Sets / Reps'),
           min: 0,
         }
       }
