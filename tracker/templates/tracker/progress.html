@@ -335,7 +335,7 @@ if (bwRaw.length) {
       },
       scales: {
         x: xAxis({ ticks: { ...TICK, maxTicksLimit: 8 } }),
-        y: yAxis('kg')
+        y: { ...yAxis('kg'), ticks: { ...TICK, stepSize: 0.2 } }
       }
     }
   });
