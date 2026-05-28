@@ -45,6 +45,7 @@
           {% if selected_ex_id %}<input type="hidden" name="exercise" value="{{ selected_ex_id }}">{% endif %}
           <label for="freq-view" class="sr-only">View by</label>
           <select id="freq-view" name="freq" class="form-control" aria-labelledby="freq-chart-title" onchange="this.form.submit()">
+            <option value="daily" {% if freq_view == 'daily' %}selected{% endif %}>Daily</option>
             <option value="weekly" {% if freq_view == 'weekly' %}selected{% endif %}>Weekly</option>
             <option value="monthly" {% if freq_view == 'monthly' %}selected{% endif %}>Monthly</option>
           </select>
@@ -196,7 +197,11 @@ const freqData   = {{ freq_data|safe }};
 const freqView   = '{{ freq_view }}';
 const freqTarget = {{ workout_target }};
 if (freqRaw.length) {
-  const freqLabels = freqRaw.map(l => freqView === 'monthly' ? fmtMonth(l) : fmtWeek(l));
+  const freqLabels = freqRaw.map(l =>
+    freqView === 'monthly' ? fmtMonth(l) :
+    freqView === 'weekly'  ? fmtWeek(l)  :
+    fmtDate(l)
+  );
   function freqEma(data, alpha) {
     return data.reduce((acc, val, i) => {
       acc.push(i === 0 ? val : Math.round((alpha * val + (1 - alpha) * acc[i - 1]) * 10) / 10);
@@ -232,8 +237,8 @@ if (freqRaw.length) {
           order: 2,
         },
         {
-          label: `Target (${freqTarget}/wk)`,
-          data: freqLabels.map(() => freqTarget),
+          label: freqView === 'daily' ? `Target (${(freqTarget/7).toFixed(2)}/day)` : `Target (${freqTarget}/wk)`,
+          data: freqLabels.map(() => freqView === 'daily' ? Math.round(freqTarget / 7 * 100) / 100 : freqTarget),
           borderColor: '#3fb950',
           borderDash: [3, 5],
           borderWidth: 1.5,
@@ -259,7 +264,7 @@ if (freqRaw.length) {
         }
       },
       scales: {
-        x: xAxis(),
+        x: xAxis({ ticks: { ...TICK, maxTicksLimit: freqView === 'daily' ? 14 : 12 } }),
         y: { ...yAxis('Workouts'), ticks: { ...TICK, stepSize: 1 }, min: 0 }
       }
     }

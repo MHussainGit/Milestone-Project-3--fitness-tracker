@@ -496,11 +496,12 @@ def progress(request):
     bw_labels = [str(e.date) for e in bw_qs]
     bw_data   = [float(e.weight) for e in bw_qs]
 
-    # Workout frequency chart data — weekly or monthly view
-    freq_view = request.GET.get('freq', 'weekly')
+    # Workout frequency chart data — daily, weekly, or monthly view
+    freq_view = request.GET.get('freq', 'daily')
     freq_labels = []
     freq_data = []
 
+    from datetime import date as _date, timedelta as td
     all_workouts = Workout.objects.filter(user=request.user).order_by('date')
     if cutoff:
         all_workouts = all_workouts.filter(date__gte=cutoff)
@@ -511,7 +512,6 @@ def progress(request):
             month_key = workout.date.strftime('%Y-%m')
             month_dict[month_key] = month_dict.get(month_key, 0) + 1
         if month_dict:
-            from datetime import date
             keys = sorted(month_dict.keys())
             start_y, start_m = map(int, keys[0].split('-'))
             end_y, end_m = map(int, keys[-1].split('-'))
@@ -524,18 +524,17 @@ def progress(request):
                 if m > 12:
                     m = 1
                     y += 1
-    else:
+    elif freq_view == 'weekly':
         week_dict = {}
         for workout in all_workouts:
             iso_year, iso_week, _ = workout.date.isocalendar()
             week_key = f"{iso_year}-W{iso_week:02d}"
             week_dict[week_key] = week_dict.get(week_key, 0) + 1
         if week_dict:
-            from datetime import date, timedelta as td
             keys = sorted(week_dict.keys())
             def _week_start(key):
                 y, w = int(key[:4]), int(key[6:])
-                return date.fromisocalendar(y, w, 1)
+                return _date.fromisocalendar(y, w, 1)
             cur = _week_start(keys[0])
             end = _week_start(keys[-1])
             while cur <= end:
@@ -544,6 +543,20 @@ def progress(request):
                 freq_labels.append(k)
                 freq_data.append(week_dict.get(k, 0))
                 cur += td(weeks=1)
+    else:
+        day_dict = {}
+        for workout in all_workouts:
+            k = str(workout.date)
+            day_dict[k] = day_dict.get(k, 0) + 1
+        if day_dict:
+            keys = sorted(day_dict.keys())
+            cur = _date.fromisoformat(keys[0])
+            end = _date.fromisoformat(keys[-1])
+            while cur <= end:
+                k = str(cur)
+                freq_labels.append(k)
+                freq_data.append(day_dict.get(k, 0))
+                cur += td(days=1)
 
     # Exercise progress — user picks an exercise
     selected_ex_id = request.GET.get('exercise', '')
