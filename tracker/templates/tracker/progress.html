@@ -236,16 +236,16 @@ if (freqRaw.length) {
           tension: 0.4,
           order: 2,
         },
-        {
-          label: freqView === 'daily' ? `Target (${(freqTarget/7).toFixed(2)}/day)` : `Target (${freqTarget}/wk)`,
-          data: freqLabels.map(() => freqView === 'daily' ? Math.round(freqTarget / 7 * 100) / 100 : freqTarget),
+        ...(freqView !== 'daily' ? [{
+          label: `Target (${freqTarget}/wk)`,
+          data: freqLabels.map(() => freqTarget),
           borderColor: '#3fb950',
           borderDash: [3, 5],
           borderWidth: 1.5,
           pointRadius: 0,
           fill: false,
           order: 1,
-        },
+        }] : []),
       ]
     },
     options: {
