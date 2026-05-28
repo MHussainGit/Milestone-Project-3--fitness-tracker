@@ -20,6 +20,13 @@ A full-stack web application designed to help gym-goers log workouts, track exer
 - [Skeleton](#skeleton)
 - [Screenshots](#screenshots)
 - [Features](#features)
+  - [Workout Logging](#workout-logging)
+  - [Progress & Analytics](#progress--analytics)
+  - [Workout Templates](#workout-templates)
+  - [Body & Wellbeing](#body--wellbeing)
+  - [Exercise Library](#exercise-library)
+  - [User Account](#user-account)
+  - [Progressive Web App](#progressive-web-app)
 - [Technology Stack](#technology-stack)
 - [Getting Started](#getting-started)
 - [Deployment](#deployment)
@@ -971,6 +978,64 @@ path('password-reset/complete/',
 ```
 Source: `tracker/urls.py`
 
+**4. PR Recalculation on Entry Deletion or Edit**
+
+When a workout entry is deleted or edited, `_recalculate_personal_record` scans all remaining entries for that user and exercise, updates the PR to the new best, or deletes the PR row entirely if no weighted entries remain.
+
+Code in `tracker/views.py`:
+
+```python
+def _recalculate_personal_record(user, exercise):
+    best = (
+        WorkoutEntry.objects
+        .filter(workout__user=user, exercise=exercise, weight__isnull=False)
+        .order_by('-weight', '-reps')
+        .select_related('workout')
+        .first()
+    )
+    if best is None:
+        PersonalRecord.objects.filter(user=user, exercise=exercise).delete()
+    else:
+        PersonalRecord.objects.update_or_create(
+            user=user, exercise=exercise,
+            defaults={
+                'best_weight':   best.weight,
+                'best_reps':     best.reps,
+                'achieved_date': best.workout.date,
+                'workout':       best.workout,
+            }
+        )
+```
+Source: `tracker/views.py`
+
+**5. Consecutive Day Streak**
+
+The streak counts consecutive calendar days on which at least one exercise entry was logged. It starts from today if today has a workout, or from yesterday (allowing the current day to still count), and resets to zero only when both today and yesterday have no logged exercises.
+
+Code in `tracker/models.py`:
+
+```python
+def streak(self, reference_date=None):
+    reference_date = reference_date or timezone.localdate()
+    workout_dates = set(
+        self.filter(entries__isnull=False)
+        .values_list('date', flat=True)
+        .distinct()
+    )
+    if reference_date in workout_dates:
+        current_date = reference_date
+    elif reference_date - timedelta(days=1) in workout_dates:
+        current_date = reference_date - timedelta(days=1)
+    else:
+        return 0
+    streak = 0
+    while current_date in workout_dates:
+        streak += 1
+        current_date -= timedelta(days=1)
+    return streak
+```
+Source: `tracker/models.py`
+
 ---
 
 #### PostgreSQL 16
@@ -1000,7 +1065,7 @@ Here are specific Chart.js features used in the codebase:
 
 **1. Mixed Chart Type (Exercise Progress)**
 
-The exercise progress chart combines a `line` dataset and a `bar` dataset on a single canvas with two y-axes, using `interaction: { mode: 'index' }` to share a tooltip across both.
+The exercise progress chart combines three datasets on a single canvas with two y-axes — Est. 1RM and Weight (kg) on the left axis, Sets bars on the right — using `interaction: { mode: 'index' }` to share a tooltip across all three.
 
 Code in `tracker/templates/tracker/progress.html`:
 
@@ -1009,8 +1074,9 @@ new Chart(document.getElementById('exChart'), {
   type: 'bar',
   data: {
     datasets: [
-      { type: 'line', label: 'Est. 1RM (kg)', yAxisID: 'y', ... },
-      { type: 'bar',  label: 'Sets',          yAxisID: 'y1', ... }
+      { type: 'line', label: 'Est. 1RM (kg)', yAxisID: 'y',  ... },
+      { type: 'bar',  label: 'Sets',          yAxisID: 'y1', ... },
+      { type: 'line', label: 'Weight (kg)',   yAxisID: 'y',  ... },
     ]
   },
   options: {
@@ -1021,21 +1087,54 @@ new Chart(document.getElementById('exChart'), {
 ```
 Source: `tracker/templates/tracker/progress.html`
 
-**2. Moving Average Dataset (Bodyweight)**
+**2. Exponential Moving Average Overlay (Bodyweight & Frequency Charts)**
 
-A 7-day moving average is computed in JavaScript and added as a second dataset on the bodyweight chart with `borderDash` to render it as a dashed overlay.
+An Exponential Moving Average (α=0.1) is computed in JavaScript and rendered as a dashed overlay on the bodyweight chart, and a separate EMA (α=0.2) is used on the frequency chart. EMA weights recent values more heavily than a fixed-window average, giving a smoother trend that responds faster to genuine changes.
 
 Code in `tracker/templates/tracker/progress.html`:
 
 ```javascript
-function movingAverage(data, win) {
-  return data.map((_, i) => {
-    if (i < win - 1) return null;
-    const slice = data.slice(i - win + 1, i + 1);
-    return Math.round(slice.reduce((a, b) => a + b, 0) / win * 10) / 10;
-  });
+function ema(data, alpha) {
+  return data.reduce((acc, val, i) => {
+    acc.push(i === 0 ? val : Math.round((alpha * val + (1 - alpha) * acc[i - 1]) * 10) / 10);
+    return acc;
+  }, []);
 }
-const bwMaData = movingAverage(bwData, 7);
+const bwMaData = ema(bwData, 0.1);
+```
+Source: `tracker/templates/tracker/progress.html`
+
+**3. Three-Dataset Exercise Progress Chart**
+
+The exercise progress chart combines three datasets on a single canvas: Est. 1RM (line, left axis), Weight kg (line, left axis), and Sets (bars, right axis), using `interaction: { mode: 'index' }` to share a tooltip across all three.
+
+Code in `tracker/templates/tracker/progress.html`:
+
+```javascript
+datasets: [
+  { type: 'line', label: 'Est. 1RM (kg)', data: exData,       yAxisID: 'y',  order: 1 },
+  { type: 'bar',  label: 'Sets',          data: exSetsData,   yAxisID: 'y1', order: 2 },
+  { type: 'line', label: 'Weight (kg)',   data: exWeightData, yAxisID: 'y',  order: 1 },
+]
+```
+Source: `tracker/templates/tracker/progress.html`
+
+**4. Workout Frequency Chart with EMA Trend and Configurable Target Line**
+
+The frequency chart renders three datasets: the raw workout counts (area), a dashed EMA trend overlay, and an optional configurable target line visible only in weekly view.
+
+Code in `tracker/templates/tracker/progress.html`:
+
+```javascript
+datasets: [
+  { label: 'Workouts',                          data: freqData,    fill: true,  order: 3 },
+  { label: 'Trend (Exponential Moving Average)', data: freqEmaData, borderDash: [5,4], order: 2 },
+  ...(freqView === 'weekly' ? [{
+    label: `Target (${freqTarget}/wk)`,
+    data: freqLabels.map(() => freqTarget),
+    borderDash: [3, 5], order: 1,
+  }] : []),
+]
 ```
 Source: `tracker/templates/tracker/progress.html`
 
@@ -1145,6 +1244,38 @@ Source: `static/css/styles.css`
 
 ---
 
+#### PWA / Service Worker
+A Web App Manifest and service worker make FitTrack installable via "Add to Home Screen" on Android and iOS. The service worker uses a cache-first strategy for static assets and a network-first strategy for HTML pages, with an offline fallback page served from cache.
+
+Found in: `static/manifest.json` (app manifest), `templates/pwa/sw.js` (service worker template rendered at `/sw.js`), `templates/pwa/offline.html` (offline fallback), `templates/base.html` (manifest link, theme-color meta, SW registration script).
+
+Code in `templates/pwa/sw.js`:
+
+```javascript
+self.addEventListener('fetch', event => {
+  const url = new URL(event.request.url);
+  if (url.pathname.startsWith('/static/')) {
+    // Cache-first for static assets
+    event.respondWith(
+      caches.match(event.request).then(cached => cached || fetch(event.request))
+    );
+    return;
+  }
+  if (event.request.mode === 'navigate') {
+    // Network-first for pages; fall back to offline page
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match('/offline/'))
+    );
+  }
+});
+```
+Source: `templates/pwa/sw.js`
+
+- Attribution: MDN Service Worker API — https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API
+- Attribution: MDN Web App Manifests — https://developer.mozilla.org/en-US/docs/Web/Manifest
+
+---
+
 ### Deployment & Services
 
 #### Heroku
@@ -1175,6 +1306,8 @@ Specific standard features referenced:
 - **CSS Custom Properties** — All colours, fonts, and spacing defined as `--var` properties on `:root` and consumed throughout the stylesheet
 - **`<optgroup>`** — Used in all exercise select fields to group exercises by muscle group
 - **`<canvas>`** — The HTML element that Chart.js renders all charts into; `aria-label` and `role` attributes applied as per MDN guidance
+- **Service Worker API** — Used to register `/sw.js` for offline caching and network-first page fetching
+- **Web App Manifest** — `manifest.json` wired via `<link rel="manifest">` to enable "Add to Home Screen" installation
 
 - Attribution: MDN Web Docs — https://developer.mozilla.org/
 
