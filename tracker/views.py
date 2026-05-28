@@ -30,6 +30,32 @@ from .forms import (
 
 # ── Helpers ────────────────────────────────────────────────────────────────
 
+def _recalculate_personal_record(user, exercise):
+    """
+    After an entry is removed, recompute the PR for user+exercise from
+    remaining entries. Deletes the PR row if no entries remain.
+    """
+    best = (
+        WorkoutEntry.objects
+        .filter(workout__user=user, exercise=exercise, weight__isnull=False)
+        .order_by('-weight', '-reps')
+        .select_related('workout')
+        .first()
+    )
+    if best is None:
+        PersonalRecord.objects.filter(user=user, exercise=exercise).delete()
+    else:
+        PersonalRecord.objects.update_or_create(
+            user=user, exercise=exercise,
+            defaults={
+                'best_weight':   best.weight,
+                'best_reps':     best.reps,
+                'achieved_date': best.workout.date,
+                'workout':       best.workout,
+            }
+        )
+
+
 def _update_personal_record(user, entry, workout):
     """
     Check if a WorkoutEntry beats the user's existing PR for that exercise.
@@ -293,7 +319,16 @@ class WorkoutDeleteView(LoginRequiredMixin, DeleteView):
 
     def form_valid(self, form):
         name = self.object.name
+        affected = list(
+            self.object.entries.filter(weight__isnull=False)
+            .values_list('exercise', flat=True).distinct()
+        )
         response = super().form_valid(form)
+        for ex_id in affected:
+            try:
+                _recalculate_personal_record(self.request.user, Exercise.objects.get(pk=ex_id))
+            except Exercise.DoesNotExist:
+                pass
         messages.info(self.request, f'"{name}" deleted.')
         return response
 
@@ -389,7 +424,9 @@ def entry_delete(request, workout_pk, pk):
     workout = get_object_or_404(Workout, pk=workout_pk, user=request.user)
     entry   = get_object_or_404(WorkoutEntry, pk=pk, workout=workout)
     if request.method == 'POST':
+        exercise = entry.exercise
         entry.delete()
+        _recalculate_personal_record(request.user, exercise)
         messages.info(request, 'Exercise removed.')
         return redirect('workout_detail', pk=workout.pk)
     return render(request, 'tracker/confirm_delete.html', {
