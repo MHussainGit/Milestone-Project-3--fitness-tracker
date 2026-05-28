@@ -573,8 +573,8 @@ All styles are hand-written in a single stylesheet using modern CSS3.
 
 ![W3C CSS Validated](<assets/validation/w3c-css-validated.png>)
 
-**Warnings (142):** All warnings are expected and informational:
-- 140 × *"CSS variables are currently not statically checked"* — the W3C validator cannot evaluate `var()` values at parse time; this is a known limitation, not a bug
+**Warnings (164):** All warnings are expected and informational:
+- 162 × *"CSS variables are currently not statically checked"* — the W3C validator cannot evaluate `var()` values at parse time; this is a known limitation, not a bug
 - 2 × *"-webkit-overflow-scrolling is a vendor extension"* — retained for legacy iOS Safari scroll momentum support
 
 ---

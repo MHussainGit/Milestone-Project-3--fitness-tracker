@@ -426,12 +426,9 @@ def exercise_edit(request, pk):
 def exercise_delete(request, pk):
     exercise = get_object_or_404(Exercise, pk=pk)
     if request.method == 'POST':
-        try:
-            name = exercise.name
-            exercise.delete()
-            messages.info(request, f'"{name}" deleted.')
-        except Exception:
-            messages.error(request, 'This exercise is used in workouts and cannot be deleted.')
+        name = exercise.name
+        exercise.delete()
+        messages.info(request, f'"{name}" deleted.')
         return redirect('exercise_list')
     return render(request, 'tracker/confirm_delete.html', {
         'object': exercise, 'object_name': exercise.name, 'cancel_url': '/exercises/',
