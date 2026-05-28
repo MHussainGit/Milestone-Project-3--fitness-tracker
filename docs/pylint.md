@@ -1,6 +1,6 @@
 # Pylint Report
 
-**Score: 9.77 / 10**
+**Score: 9.78 / 10**
 
 Run with `pylint-django` plugin against `tracker/` and `fittrack/`, excluding auto-generated migrations.
 
@@ -38,6 +38,7 @@ Previously resolved:
 |------|------|------|------------|
 | tracker/views.py | 504 | W0404 | Moved `date` import to top-level; removed inline reimport |
 | tracker/views.py | 504 | C0415 | Removed `from datetime import …` inside function body |
+| tracker/models.py | 68 | C0325 | Removed unnecessary parentheses after `elif` keyword |
 
 ## Configuration
 

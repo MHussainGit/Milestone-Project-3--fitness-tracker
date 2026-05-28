@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Offline{% endblock %}
+{% block content %}
+<div class="container-sm" style="text-align:center;padding:4rem 1rem">
+  <div style="font-size:3rem;margin-bottom:1rem" aria-hidden="true">📶</div>
+  <h1>You're offline</h1>
+  <p style="color:var(--muted);margin-top:.75rem">
+    FitTrack couldn't reach the server. Check your connection and try again.
+  </p>
+  <a href="/dashboard/" class="btn btn-primary" style="margin-top:1.5rem">Try again</a>
+</div>
+{% endblock %}

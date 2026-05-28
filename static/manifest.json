@@ -1,0 +1,24 @@
+{
+  "name": "FitTrack — Fitness Tracker",
+  "short_name": "FitTrack",
+  "description": "Log workouts, track exercises and monitor your fitness progress.",
+  "start_url": "/dashboard/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#0d1117",
+  "background_color": "#0d1117",
+  "icons": [
+    {
+      "src": "/static/assets/dumbbell.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/assets/dumbbell.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

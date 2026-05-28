@@ -61,6 +61,7 @@ Key focal points:
 - Bodyweight tracker and daily notes with mood tracking
 - CSV export of full workout history
 - Email-based password reset flow
+- Progressive Web App (PWA) — installable on Android and iOS via "Add to Home Screen"
 - Arctic Blue dark theme — fully custom CSS with no framework dependency
 - Secure per-user data isolation with object-level access control
 
@@ -251,13 +252,14 @@ The website wireframes were created using Balsamiq and can be viewed below.
 - **CSV Export** — Download complete workout history as a CSV file
 
 ### Progress & Analytics
-- **Summary Stat Cards** — Total Workouts, Day Streak, Avg Workouts/Week, and Personal Record count displayed above charts
+- **Summary Stat Cards** — Total Workouts, Day Streak, Avg Workouts/Week, and Personal Record count displayed above charts; streak badge shown only at 3+ consecutive days and resets when a day with no exercises is missed
 - **Date Range Filter** — Filter all charts simultaneously by 30d / 90d / 6m / 1y / All time
 - **Workout Frequency Chart** — Area chart with daily / weekly / monthly views; dashed Exponential Moving Average trend overlay; configurable weekly target line (weekly view only); zero-filled gaps so rest periods are visible
 - **Bodyweight Chart** — Line chart with dashed Exponential Moving Average overlay (α=0.1) and 0.2 kg y-axis intervals
 - **Exercise Progress Chart** — Mixed chart: Est. 1RM line and actual Weight (kg) line on the left axis; Sets bars on the right axis; shared tooltip
 - **Personal Records Board** — Lifetime PR table per exercise showing best weight, reps, est. 1RM, and date
-- **Automatic PR Detection** — PRs detected and updated automatically every time a workout is saved
+- **Automatic PR Detection** — PRs detected and updated automatically every time a workout is saved; recalculated correctly on entry edit or deletion; 🏆 trophy badge shown on the PR-setting entry in workout detail
+- **Recalculate PRs** — Profile page button to recompute all personal records from full workout history (fixes any stale data)
 
 ### Workout Templates
 - **Template Library** — Create and manage named workout templates (e.g., "Push Day", "Leg Day")
@@ -265,7 +267,7 @@ The website wireframes were created using Balsamiq and can be viewed below.
 - **Launch from Template** — Start a new workout pre-filled from a template in one click
 
 ### Body & Wellbeing
-- **Bodyweight Tracker** — Log daily weigh-ins; visualised with 7-day moving average chart
+- **Bodyweight Tracker** — Log daily weigh-ins; visualised with Exponential Moving Average chart
 - **Daily Notes** — Add notes per day with mood tracking (Great / Good / OK / Tired / Bad)
 - **Today's Note** — Displayed on the dashboard for quick reference
 
@@ -281,6 +283,13 @@ The website wireframes were created using Balsamiq and can be viewed below.
 - **Profile Page** — View account details, set weekly workout target, and permanently delete account
 - **Weekly Workout Target** — Configurable target (1–14 workouts/week) editable on the dashboard and profile page; displayed as a target line on the weekly frequency chart
 - **Access Control** — All data scoped to the authenticated user; direct URL access to another user's data returns 404
+- **Recalculate PRs** — One-click button on the profile page to recompute all personal records from workout history
+
+### Progressive Web App
+- **Installable** — Add to Home Screen on Android (Chrome) and iOS (Safari) for a native-like experience
+- **Offline Fallback** — Cached offline page shown when the network is unavailable
+- **Service Worker** — Cache-first for static assets; network-first for pages
+- **App Manifest** — Standalone display mode, Arctic Blue theme colour, dumbbell icon
 
 ---
 
@@ -303,6 +312,7 @@ The website wireframes were created using Balsamiq and can be viewed below.
 | **Google Fonts** | — | Roboto (body and display typography) |
 | **Heroku** | — | Cloud deployment and hosting |
 | **Resend / SMTP** | — | Transactional email for password reset |
+| **PWA / Service Worker** | — | Installable web app with offline fallback and static asset caching |
 
 ---
 
@@ -531,7 +541,7 @@ The project uses Django's built-in form validation and adheres to PEP 8 style gu
 - All views are protected by `@login_required` or `LoginRequiredMixin`
 - `full_clean()` is called implicitly on all form saves
 
-- ✅ Pylint score: **9.77/10** — see [docs/pylint.md](docs/pylint.md) for the full report
+- ✅ Pylint score: **9.78/10** — see [docs/pylint.md](docs/pylint.md) for the full report
 
 **Validation checks performed:**
 - ✅ Required fields enforced (username, password, workout name, exercise name, sets, reps)

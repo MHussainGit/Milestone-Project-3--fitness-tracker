@@ -87,6 +87,16 @@ def _update_personal_record(user, entry, workout):
     return created  # True when first time logging this exercise
 
 
+# ── PWA ────────────────────────────────────────────────────────────────────
+
+def service_worker(request):
+    return render(request, 'pwa/sw.js', content_type='application/javascript')
+
+
+def offline(request):
+    return render(request, 'pwa/offline.html')
+
+
 # ── Auth ───────────────────────────────────────────────────────────────────
 
 def register_view(request):

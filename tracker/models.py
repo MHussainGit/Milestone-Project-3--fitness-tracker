@@ -65,7 +65,7 @@ class WorkoutQuerySet(models.QuerySet):
 
         if reference_date in workout_dates:
             current_date = reference_date
-        elif (reference_date - timedelta(days=1)) in workout_dates:
+        elif reference_date - timedelta(days=1) in workout_dates:
             current_date = reference_date - timedelta(days=1)
         else:
             return 0
