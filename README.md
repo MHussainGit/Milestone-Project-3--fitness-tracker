@@ -740,10 +740,16 @@ Google Lighthouse was used to generate objective performance and accessibility r
 
 | Metric | Desktop | Mobile | Target |
 | :--- | :---: | :---: | :---: |
-| Performance | 97 | 91 | 85+ |
+| Performance | 99 | 93 | 85+ |
 | Accessibility | 100 | 100 | 90+ |
 | Best Practices | 100 | 100 | 90+ |
 | SEO | 100 | 100 | 95+ |
+
+##### Desktop
+![Lighthouse Desktop](<assets/validation/lighthouse-desktop.png>)
+
+##### Mobile
+![Lighthouse Mobile](<assets/validation/lighthouse-mobile.png>)
 
 #### Key Audit Findings
 
