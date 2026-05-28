@@ -48,8 +48,9 @@ urlpatterns = [
     path('templates/<int:template_pk>/items/<int:pk>/delete/',  views.template_item_delete, name='template_item_delete'),
 
     # User profile
-    path('profile/',         views.profile,        name='profile'),
-    path('profile/delete/',  views.profile_delete, name='profile_delete'),
+    path('profile/',                    views.profile,             name='profile'),
+    path('profile/delete/',             views.profile_delete,      name='profile_delete'),
+    path('profile/recalculate-prs/',    views.recalculate_prs,     name='recalculate_prs'),
 
     # Password reset
     path('password-reset/',

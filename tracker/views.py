@@ -144,6 +144,25 @@ def profile(request):
 
 
 @login_required
+def recalculate_prs(request):
+    if request.method == 'POST':
+        exercise_ids = (
+            WorkoutEntry.objects
+            .filter(workout__user=request.user, weight__isnull=False)
+            .values_list('exercise_id', flat=True)
+            .distinct()
+        )
+        for ex_id in exercise_ids:
+            try:
+                _recalculate_personal_record(request.user, Exercise.objects.get(pk=ex_id))
+            except Exercise.DoesNotExist:
+                pass
+        count = exercise_ids.count()
+        messages.success(request, f'Personal records recalculated for {count} exercise{"s" if count != 1 else ""}.')
+    return redirect('profile')
+
+
+@login_required
 def profile_delete(request):
     if request.method == 'POST':
         user = request.user

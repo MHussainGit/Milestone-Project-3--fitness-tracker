@@ -37,6 +37,14 @@
       </div>
     </form>
 
+    <form method="post" action="{% url 'recalculate_prs' %}" style="margin-top:1.5rem;border-top:1px solid var(--border);padding-top:1.5rem">
+      {% csrf_token %}
+      <p style="color:var(--muted);font-size:.9rem;margin-bottom:.75rem">
+        If your personal records look incorrect, use this to recompute them from your full workout history.
+      </p>
+      <button type="submit" class="btn btn-secondary">Recalculate Personal Records</button>
+    </form>
+
     <div class="form-actions" style="margin-top: 2rem; justify-content: flex-start; gap: 1rem;">
       <a href="{% url 'profile_delete' %}" class="btn btn-danger">Delete Profile</a>
       <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
