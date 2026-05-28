@@ -297,10 +297,11 @@ if (bwRaw.length) {
 }
 
 // ── 3. Exercise Progress — line (weight) + bar (sets) ────────────────────────
-const exRaw      = {{ ex_labels|safe }};
-const exData     = {{ ex_data|safe }};
-const exSetsData = {{ ex_sets_data|safe }};
-const exRepsData = {{ ex_reps_data|safe }};
+const exRaw        = {{ ex_labels|safe }};
+const exData       = {{ ex_data|safe }};
+const exSetsData   = {{ ex_sets_data|safe }};
+const exRepsData   = {{ ex_reps_data|safe }};
+const exWeightData = {{ ex_weight_data|safe }};
 if (exRaw.length && document.getElementById('exChart')) {
   const exLabels = exRaw.map(s => fmtDate(s));
   new Chart(document.getElementById('exChart'), {
@@ -334,15 +335,15 @@ if (exRaw.length && document.getElementById('exChart')) {
         },
         {
           type: 'line',
-          label: 'Reps',
-          data: exRepsData,
+          label: 'Weight (kg)',
+          data: exWeightData,
           borderColor: '#ffa657',
           backgroundColor: 'rgba(255,166,87,0.08)',
           tension: 0.3,
           pointRadius: 3,
           pointHoverRadius: 5,
           borderWidth: 2,
-          yAxisID: 'y1',
+          yAxisID: 'y',
           order: 1,
         }
       ]
@@ -361,7 +362,7 @@ if (exRaw.length && document.getElementById('exChart')) {
           position: 'right',
           ticks: { ...TICK, stepSize: 1 },
           grid: { drawOnChartArea: false },
-          title: axisTitle('Sets / Reps'),
+          title: axisTitle('Sets'),
           min: 0,
         }
       }
