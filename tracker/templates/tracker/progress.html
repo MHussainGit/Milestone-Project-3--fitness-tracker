@@ -236,7 +236,7 @@ if (freqRaw.length) {
           tension: 0.4,
           order: 2,
         },
-        ...(freqView !== 'daily' ? [{
+        ...(freqView === 'weekly' ? [{
           label: `Target (${freqTarget}/wk)`,
           data: freqLabels.map(() => freqTarget),
           borderColor: '#3fb950',
