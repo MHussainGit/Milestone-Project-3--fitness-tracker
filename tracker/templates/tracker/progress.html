@@ -226,7 +226,7 @@ if (freqRaw.length) {
           order: 3,
         },
         {
-          label: 'Trend (EMA)',
+          label: 'Trend (Exponential Moving Average)',
           data: freqEmaData,
           borderColor: '#58a6ff',
           borderDash: [5, 4],
@@ -257,7 +257,7 @@ if (freqRaw.length) {
           callbacks: {
             label: ctx => {
               if (ctx.dataset.label.startsWith('Target')) return `Target: ${freqTarget} workouts/${freqView === 'monthly' ? 'mo' : 'wk'}`;
-              if (ctx.dataset.label === 'Trend (EMA)') return `EMA trend: ${ctx.parsed.y}`;
+              if (ctx.dataset.label === 'Trend (Exponential Moving Average)') return `Exponential Moving Average trend: ${ctx.parsed.y}`;
               return `${ctx.parsed.y} workouts`;
             }
           }
