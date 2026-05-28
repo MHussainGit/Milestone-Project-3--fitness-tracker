@@ -3,7 +3,7 @@ tracker/views.py — All view functions for FitTrack.
 """
 import csv
 import json
-from datetime import timedelta
+from datetime import date as _date, timedelta
 
 from django.contrib import messages
 from django.contrib.auth import login, logout
@@ -501,7 +501,6 @@ def progress(request):
     freq_labels = []
     freq_data = []
 
-    from datetime import date as _date, timedelta as td
     all_workouts = Workout.objects.filter(user=request.user).order_by('date')
     if cutoff:
         all_workouts = all_workouts.filter(date__gte=cutoff)
@@ -542,7 +541,7 @@ def progress(request):
                 k = f"{iso_y}-W{iso_w:02d}"
                 freq_labels.append(k)
                 freq_data.append(week_dict.get(k, 0))
-                cur += td(weeks=1)
+                cur += timedelta(weeks=1)
     else:
         day_dict = {}
         for workout in all_workouts:
@@ -556,7 +555,7 @@ def progress(request):
                 k = str(cur)
                 freq_labels.append(k)
                 freq_data.append(day_dict.get(k, 0))
-                cur += td(days=1)
+                cur += timedelta(days=1)
 
     # Exercise progress — user picks an exercise
     selected_ex_id = request.GET.get('exercise', '')

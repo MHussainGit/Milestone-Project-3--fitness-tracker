@@ -32,6 +32,13 @@ All remaining warnings are `C0301 line-too-long` in `tracker/management/commands
 | tracker/admin.py  | 2  | C0301 | Line too long (133/120) |
 | tracker/urls.py   | 48 | C0301 | Line too long (121/120) |
 
+Previously resolved:
+
+| File | Line | Code | Resolution |
+|------|------|------|------------|
+| tracker/views.py | 504 | W0404 | Moved `date` import to top-level; removed inline reimport |
+| tracker/views.py | 504 | C0415 | Removed `from datetime import …` inside function body |
+
 ## Configuration
 
 Suppressions are managed via `.pylintrc` at the project root. The following checks are disabled as Django false positives:

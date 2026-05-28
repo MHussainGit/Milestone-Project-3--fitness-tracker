@@ -55,7 +55,7 @@ FitTrack is a full-stack web application that empowers users to systematically l
 
 Key focal points:
 - Streamlined workout logging with inline exercise entry — all exercises logged on a single page using an inline formset
-- Progress charts: workout frequency (area chart), bodyweight trend with 7-day moving average, and per-exercise estimated 1RM
+- Progress charts: workout frequency (area chart with EMA trend), bodyweight trend with Exponential Moving Average, and per-exercise estimated 1RM and actual weight
 - Personal records board with automatic PR detection on every workout save
 - Workout templates for quickly starting a session from a saved routine
 - Bodyweight tracker and daily notes with mood tracking
@@ -86,7 +86,7 @@ The site provides tangible value to these audiences across four key dimensions:
 
 - **Accountability Through History**: By providing a persistent, searchable workout log, users gain an unambiguous record of their training. This creates accountability and reveals patterns — for example, noticing that a particular muscle group hasn't been trained in several weeks.
 
-- **Progress Visualisation**: The progress page delivers three distinct chart types for different data shapes: an area chart for training frequency, a line chart with 7-day moving average for bodyweight, and a mixed bar and line chart for per-exercise estimated 1RM over time. This allows users to see trends that raw numbers cannot convey.
+- **Progress Visualisation**: The progress page delivers three distinct chart types: an area chart for training frequency (daily/weekly/monthly) with an EMA trend overlay and configurable target line; a line chart with Exponential Moving Average for bodyweight; and a mixed chart showing both estimated 1RM and actual weight lifted per exercise. This allows users to see trends that raw numbers cannot convey.
 
 - **Automatic PR Detection**: Personal records are detected and stored automatically whenever a workout entry is saved. The PR board on the progress page and dashboard shows best weight, reps, and estimated 1RM per exercise — without any manual input from the user.
 
@@ -119,7 +119,7 @@ FitTrack addresses the needs of gym users who require a fast, reliable logging t
 
 2. **Inline Exercise Entry**: Rather than requiring a separate page load per exercise, all exercises are added to a new workout on one page using a Django inline formset. The "+ Add Exercise" button appends a new row without a page reload, drastically reducing the number of interactions needed to log a full session.
 
-3. **Progress Charts by Data Shape**: Different data types are visualised with the most appropriate chart type. Training frequency uses an area chart to convey volume over time. Bodyweight uses a line chart with a dashed 7-day moving average overlay to smooth daily fluctuations. Exercise progress uses a mixed bar and line chart to simultaneously show sets (volume) and estimated 1RM (strength) with shared tooltips.
+3. **Progress Charts by Data Shape**: Different data types are visualised with the most appropriate chart type. Training frequency uses an area chart with daily/weekly/monthly granularity, a dashed Exponential Moving Average trend overlay, and an optional target line. Bodyweight uses a line chart with a dashed EMA (α=0.1) overlay to smooth daily fluctuations. Exercise progress uses a mixed chart showing both estimated 1RM and actual weight lifted on the left axis, with sets bars on the right axis.
 
 4. **Estimated 1RM over Raw Weight**: The exercise progress chart plots estimated 1RM using the Epley formula (`weight × (1 + reps / 30)`) rather than raw weight. This normalises for rep variation — a lighter set performed for more reps can reflect greater strength than a heavier single set — giving users a more meaningful trend line.
 
@@ -253,9 +253,9 @@ The website wireframes were created using Balsamiq and can be viewed below.
 ### Progress & Analytics
 - **Summary Stat Cards** — Total Workouts, Day Streak, Avg Workouts/Week, and Personal Record count displayed above charts
 - **Date Range Filter** — Filter all charts simultaneously by 30d / 90d / 6m / 1y / All time
-- **Workout Frequency Chart** — Area chart showing workouts per week or month with human-readable axis labels
-- **Bodyweight Chart** — Line chart with 7-day moving average dashed overlay
-- **Exercise Progress Chart** — Mixed bar (sets on right axis) and line (estimated 1RM on left axis) with shared tooltip; reps shown on hover
+- **Workout Frequency Chart** — Area chart with daily / weekly / monthly views; dashed Exponential Moving Average trend overlay; configurable weekly target line (weekly view only); zero-filled gaps so rest periods are visible
+- **Bodyweight Chart** — Line chart with dashed Exponential Moving Average overlay (α=0.1) and 0.2 kg y-axis intervals
+- **Exercise Progress Chart** — Mixed chart: Est. 1RM line and actual Weight (kg) line on the left axis; Sets bars on the right axis; shared tooltip
 - **Personal Records Board** — Lifetime PR table per exercise showing best weight, reps, est. 1RM, and date
 - **Automatic PR Detection** — PRs detected and updated automatically every time a workout is saved
 
@@ -273,12 +273,13 @@ The website wireframes were created using Balsamiq and can be viewed below.
 - **Shared Library** — Browse exercises by name and muscle group
 - **Grouped Dropdowns** — All exercise selectors use `<optgroup>` labels by muscle group
 - **Custom Exercises** — Add exercises with category, muscle group, and description
-- **PROTECT Constraint** — Exercises used in past workouts cannot be deleted, preserving data integrity
+- **CASCADE Delete** — Deleting an exercise removes its associated workout entries and personal records automatically
 
 ### User Account
 - **Registration & Login** — Secure registration and login with PBKDF2 password hashing
 - **Password Reset** — Email-based four-step forgot-password flow: request → sent → confirm → complete
-- **Profile Page** — View account details and permanently delete account
+- **Profile Page** — View account details, set weekly workout target, and permanently delete account
+- **Weekly Workout Target** — Configurable target (1–14 workouts/week) editable on the dashboard and profile page; displayed as a target line on the weekly frequency chart
 - **Access Control** — All data scoped to the authenticated user; direct URL access to another user's data returns 404
 
 ---
@@ -448,14 +449,15 @@ See `.env.example` for full documentation of all available email options.
 User (Django auth_user)
  ├─ Workout            [user FK → User, CASCADE]
  │   └─ WorkoutEntry   [workout FK → Workout, CASCADE]
- │                      [exercise FK → Exercise, PROTECT]
+ │                      [exercise FK → Exercise, CASCADE]
  ├─ PersonalRecord     [user FK → User, CASCADE]
- │                      [exercise FK → Exercise, PROTECT]
+ │                      [exercise FK → Exercise, CASCADE]
  ├─ BodyWeightEntry    [user FK → User, CASCADE]
  ├─ DailyNote          [user FK → User, CASCADE]
- └─ WorkoutTemplate    [user FK → User, CASCADE]
-     └─ WorkoutTemplateItem [template FK → WorkoutTemplate, CASCADE]
-                             [exercise FK → Exercise, PROTECT]
+ ├─ WorkoutTemplate    [user FK → User, CASCADE]
+ │   └─ WorkoutTemplateItem [template FK → WorkoutTemplate, CASCADE]
+ │                           [exercise FK → Exercise, CASCADE]
+ └─ UserProfile        [user FK → User, CASCADE]
 
 Exercise (shared library — no user FK)
 ```
@@ -473,11 +475,13 @@ Exercise (shared library — no user FK)
 | `tracker_dailynote` | id, user_id, date, content, mood | One note per user per date |
 | `tracker_workouttemplate` | id, user_id, name, notes | Named template per user |
 | `tracker_workouttemplatem item` | id, template_id, exercise_id, sets, reps, notes | Exercises within a template |
+| `tracker_userprofile` | id, user_id, workout_target | One profile per user; workout_target defaults to 3 |
 
 **Key Design Decisions:**
-- `exercise_id` on `WorkoutEntry` uses a PROTECT constraint — exercises used in past workouts cannot be deleted, preserving the integrity of historical data
+- `exercise_id` on `WorkoutEntry` uses a CASCADE constraint — deleting an exercise removes its workout entries and personal records automatically
 - `weight` is nullable on `WorkoutEntry` — this allows bodyweight exercises (pull-ups, push-ups) to be logged without a weight value
 - `PersonalRecord` is upserted (updated or created) on every workout save, so the board always reflects the user's current all-time best
+- `UserProfile` is created on first access via `get_or_create`, so no signup step is required
 
 ---
 
@@ -960,7 +964,7 @@ Source: `tracker/urls.py`
 ---
 
 #### PostgreSQL 16
-PostgreSQL is the production relational database, providing ACID compliance, foreign key constraints (including PROTECT for exercise integrity), and efficient querying via Django's ORM.
+PostgreSQL is the production relational database, providing ACID compliance, foreign key constraints (CASCADE on exercise deletion to workout entries and personal records), and efficient querying via Django's ORM.
 
 Found in: `fittrack/settings.py` via `dj-database-url` parsing `DATABASE_URL`; used by all models in `tracker/models.py`.
 
