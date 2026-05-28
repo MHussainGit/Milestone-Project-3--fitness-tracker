@@ -173,7 +173,7 @@ function fmtDate(s, includeYear = false) {
   return d.toLocaleDateString('en-GB', opts);
 }
 
-// Format "YYYY-Www" → "17 Mar" (Monday of that ISO week)
+// Format "YYYY-Www" → "w/c 17 Mar" (Monday of that ISO week)
 function fmtWeek(s) {
   const [yearStr, wStr] = s.split('-W');
   const year = parseInt(yearStr), week = parseInt(wStr);
@@ -182,7 +182,7 @@ function fmtWeek(s) {
   w1Mon.setDate(jan4.getDate() - ((jan4.getDay() || 7) - 1));
   const d = new Date(w1Mon);
   d.setDate(w1Mon.getDate() + (week - 1) * 7);
-  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  return 'w/c ' + d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 
 // Format "YYYY-MM" → "Mar '25"
