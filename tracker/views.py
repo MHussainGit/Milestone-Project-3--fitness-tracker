@@ -343,11 +343,14 @@ class WorkoutDeleteView(LoginRequiredMixin, DeleteView):
 def workout_detail(request, pk):
     workout = get_object_or_404(Workout, pk=pk, user=request.user)
     entries = workout.entries.select_related('exercise')
-    prs = {pr.exercise_id for pr in PersonalRecord.objects.filter(user=request.user)}
+    pr_exercises = set(
+        PersonalRecord.objects.filter(user=request.user, workout=workout)
+        .values_list('exercise_id', flat=True)
+    )
     return render(request, 'tracker/workout_detail.html', {
-        'workout': workout,
-        'entries': entries,
-        'prs':     prs,
+        'workout':      workout,
+        'entries':      entries,
+        'pr_exercises': pr_exercises,
     })
 
 

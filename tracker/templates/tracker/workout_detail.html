@@ -40,10 +40,10 @@
         </tr></thead>
         <tbody>
           {% for entry in entries %}
-          <tr {% if entry.is_pr %}class="pr-row"{% endif %}>
+          <tr {% if entry.exercise_id in pr_exercises %}class="pr-row"{% endif %}>
             <td>
               <strong>{{ entry.exercise.name }}</strong>
-              {% if entry.is_pr %}<span class="badge badge-accent" style="margin-left:.4rem">🏆 PR</span>{% endif %}
+              {% if entry.exercise_id in pr_exercises %}<span class="badge badge-accent" style="margin-left:.4rem">🏆 PR</span>{% endif %}
             </td>
             <td><span class="badge badge-{{ entry.exercise.category }}">{{ entry.exercise.category }}</span></td>
             <td>{{ entry.sets }}</td>
