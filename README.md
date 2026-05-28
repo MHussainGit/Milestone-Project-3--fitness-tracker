@@ -34,6 +34,10 @@ A full-stack web application designed to help gym-goers log workouts, track exer
 - [Security Features](#security-features)
 - [Accessibility](#accessibility)
 - [Validation](#validation)
+  - [Python / Django](#python--django)
+  - [HTML5](#html5)
+  - [CSS3](#css3)
+  - [JavaScript](#javascript)
 - [Testing Documentation](#testing-documentation)
   - [Overview](#overview)
   - [Testing Methodology](#testing-methodology)
@@ -597,6 +601,14 @@ All styles are hand-written in a single stylesheet using modern CSS3.
 **Warnings (164):** All warnings are expected and informational:
 - 162 × *"CSS variables are currently not statically checked"* — the W3C validator cannot evaluate `var()` values at parse time; this is a known limitation, not a bug
 - 2 × *"-webkit-overflow-scrolling is a vendor extension"* — retained for legacy iOS Safari scroll momentum support
+
+### JavaScript
+
+The service worker (`templates/pwa/sw.js`) was validated using JSLint. The only unfixable warning is on line 1 (`{% load static %}`) which is a Django template tag required for static file resolution — JSLint cannot parse Django syntax.
+
+#### JSLint Validation Result — Service Worker
+
+![JSLint — Service Worker](<assets/validation/service-worker-jslint-validated.png>)
 
 ---
 
