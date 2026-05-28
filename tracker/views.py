@@ -252,14 +252,20 @@ def workout_create(request):
             workout = form.save(commit=False)
             workout.user = request.user
             workout.save()
+            pr_count = 0
             for entry in formset.save(commit=False):
                 entry.workout = workout
                 entry.save()
-                _update_personal_record(request.user, entry, workout)
-            if template_obj:
-                messages.success(request, f'Workout created from template "{template_obj.name}"!')
+                is_pr = _update_personal_record(request.user, entry, workout)
+                if is_pr:
+                    entry.is_pr = True
+                    entry.save(update_fields=['is_pr'])
+                    pr_count += 1
+            base_msg = f'Workout created from template "{template_obj.name}"!' if template_obj else 'Workout created!'
+            if pr_count:
+                messages.success(request, f'{base_msg} 🏆 {pr_count} new personal record{"s" if pr_count > 1 else ""}!')
             else:
-                messages.success(request, 'Workout created!')
+                messages.success(request, base_msg)
             return redirect('workout_detail', pk=workout.pk)
     else:
         initial = {'date': timezone.now().date()}
