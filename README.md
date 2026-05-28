@@ -210,35 +210,35 @@ The website wireframes were created using Balsamiq and can be viewed below.
 
 ## Screenshots
 
+### Login
+#### ![Login](<assets/screenshots/login.png>)
+
+### Register
+#### ![Register](<assets/screenshots/register.png>)
+
 ### Dashboard
-#### ![Desktop - Dashboard](<docs/screenshots/desktop-dashboard.png>)
+#### ![Dashboard](<assets/screenshots/dashboard.png>)
 
-### New Workout — Inline Exercise Entry
-#### ![Desktop - New Workout](<docs/screenshots/desktop-new-workout.png>)
+### Log Workout — Inline Exercise Entry
+#### ![Log Workout](<assets/screenshots/+log-workout.png>)
 
-### Workout Detail
-#### ![Desktop - Workout Detail](<docs/screenshots/desktop-workout-detail.png>)
+### Workouts
+#### ![Workouts](<assets/screenshots/workouts.png>)
 
-### Progress Page — Stat Cards & Date Filter
-#### ![Desktop - Progress Page](<docs/screenshots/desktop-progress.png>)
+### Exercises
+#### ![Exercises](<assets/screenshots/exercises.png>)
 
-### Progress Page — Exercise Chart (Est. 1RM)
-#### ![Desktop - Exercise Chart](<docs/screenshots/desktop-exercise-chart.png>)
+### Progress
+#### ![Progress](<assets/screenshots/progress.png>)
 
-### Personal Records Board
-#### ![Desktop - Personal Records](<docs/screenshots/desktop-personal-records.png>)
+### Notes
+#### ![Notes](<assets/screenshots/notes.png>)
 
-### Workout Templates
-#### ![Desktop - Templates](<docs/screenshots/desktop-templates.png>)
+### My Profile
+#### ![My Profile](<assets/screenshots/my-profile.png>)
 
-### Daily Notes
-#### ![Desktop - Notes](<docs/screenshots/desktop-notes.png>)
-
-### Mobile — Dashboard
-#### ![Mobile - Dashboard](<docs/screenshots/mobile-dashboard.png>)
-
-### Mobile — New Workout
-#### ![Mobile - New Workout](<docs/screenshots/mobile-new-workout.png>)
+### Delete Profile
+#### ![Delete Profile](<assets/screenshots/delete-profile.png>)
 
 ---
 
