@@ -701,9 +701,9 @@ python manage.py test --verbosity=2
 
 | Screenshot | Description |
 | :--- | :--- |
-| ![Access the Bodyweight Tracker](assets/screenshots/progress.png) | Access the bodyweight tracker directly from the dashboard |
+| ![Access the Bodyweight Tracker](assets/user-stories/access-bodyweight-tracker.png) | Access the bodyweight tracker directly from the dashboard |
 | ![Bodyweight Tracker](assets/user-stories/bodyweight-tracker.png) | View, add and delete bodyweight values with dates to keep track of it |
-| ![Bodyweight Progress Chart](assets/user-stories/bodyweight-chart.png.png) | Progress page showing bodyweight chart with exponential moving average overlay |
+| ![Bodyweight Progress Chart](assets/user-stories/bodyweight-chart.png) | Progress page showing bodyweight chart with exponential moving average overlay |
 
 ---
 
