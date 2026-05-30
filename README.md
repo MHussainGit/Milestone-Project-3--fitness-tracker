@@ -163,11 +163,8 @@ FitTrack addresses the needs of gym users who require a fast, reliable logging t
 
 4. **As a user tracking body composition**, I want to log my bodyweight daily and see a smoothed trend line so that I can see genuine progress through normal daily weight fluctuations.
 
-5. **As a mobile user**, I want to access my workout history from my phone during or after my session so that I can check what weight I used last time and stay accountable.
 
-6. **As a privacy-conscious user**, I want my workout data stored securely in my own account so that it is not shared with third parties or visible to other users.
-
-7. **As a user who forgot their password**, I want to request a reset link by email so that I am not permanently locked out of my account.
+5. **As a user who forgot their password**, I want to request a reset link by email so that I am not permanently locked out of my account.
 
 ---
 
@@ -668,19 +665,19 @@ python manage.py test --verbosity=2
 
 | Screenshot | Description |
 | :--- | :--- |
-| ![New Workout](docs/screenshots/desktop-new-workout.png) | New workout form with inline exercise rows |
-| ![Workout Detail](docs/screenshots/desktop-workout-detail.png) | Workout detail page after saving |
+| ![Log Workout](assets/screenshots/+log-workout.png) | New workout form with inline exercise rows |
+| ![Workouts](assets/screenshots/workouts.png) | Workout list after saving |
 
 ---
 
 #### User Story 2
 > *"As a gym regular, I want to see my estimated 1RM trend for key exercises..."*
 
-**Result:** The exercise progress chart on the progress page plots estimated 1RM per workout entry using the Epley formula. The left y-axis shows est. 1RM in kg; the right y-axis shows sets. A shared tooltip on hover displays both values plus reps for that date. The latest est. 1RM is also shown as a stat card above the chart.
+**Result:** The exercise progress chart on the progress page plots estimated 1RM and actual weight lifted per workout entry using the Epley formula. The left y-axis shows est. 1RM and weight in kg; the right y-axis shows sets. A shared tooltip on hover displays all values for that date. The latest est. 1RM is also shown as a stat card above the chart.
 
 | Screenshot | Description |
 | :--- | :--- |
-| ![Exercise Chart](docs/screenshots/desktop-exercise-chart.png) | Exercise progress chart with est. 1RM line and sets bars |
+| ![Progress](assets/screenshots/progress.png) | Progress page showing exercise chart with Est. 1RM and weight lines |
 
 ---
 
@@ -691,18 +688,29 @@ python manage.py test --verbosity=2
 
 | Screenshot | Description |
 | :--- | :--- |
-| ![Templates](docs/screenshots/desktop-templates.png) | Template library and detail page |
+| ![Log Workout](assets/screenshots/+log-workout.png) | New workout pre-filled from a template |
 
 ---
 
 #### User Story 4
 > *"As a user tracking body composition, I want to log bodyweight daily and see a smoothed trend..."*
 
-**Result:** The bodyweight tracker (`/bodyweight/`) stores daily entries. The bodyweight chart on the progress page plots raw weigh-ins as a solid line and overlays a 7-day moving average as a dashed purple line, smoothing daily fluctuations so the underlying trend is clearly visible.
+**Result:** The bodyweight tracker (`/bodyweight/`) stores daily entries. The bodyweight chart on the progress page plots raw weigh-ins as a solid line and overlays an Exponential Moving Average (α=0.1) as a dashed line, smoothing daily fluctuations so the underlying trend is clearly visible.
 
 | Screenshot | Description |
 | :--- | :--- |
-| ![Bodyweight Chart](docs/screenshots/desktop-progress.png) | Progress page showing bodyweight chart with moving average |
+| ![Progress](assets/screenshots/progress.png) | Progress page showing bodyweight chart with EMA overlay |
+
+---
+
+#### User Story 5
+> *"As a user who forgot their password, I want to request a reset link by email..."*
+
+**Result:** The password reset flow is wired using Django's built-in views. A POST to `/password-reset/` with a registered email returns a 302 redirect to `/password-reset/done/`. A time-limited token link is emailed to the user; following it renders the set-new-password form. The token is invalidated after use, preventing reuse.
+
+| Screenshot | Description |
+| :--- | :--- |
+| ![Login](assets/screenshots/login.png) | Login page with "Forgot password?" link |
 
 ---
 
