@@ -665,8 +665,8 @@ python manage.py test --verbosity=2
 
 | Screenshot | Description |
 | :--- | :--- |
-| ![Log Workout](assets/screenshots/+log-workout.png) | New workout form with inline exercise rows |
-| ![Workouts](assets/screenshots/workouts.png) | Workout list after saving |
+| ![Log Workout](assets/user-stories/+log-workout.png) | New workout form with inline exercise rows |
+| ![Workouts](assets/user-stories/workouts.png) | Workout list after saving |
 
 ---
 
@@ -677,7 +677,7 @@ python manage.py test --verbosity=2
 
 | Screenshot | Description |
 | :--- | :--- |
-| ![Progress](assets/screenshots/progress.png) | Progress page showing exercise chart with Est. 1RM and weight lines |
+| ![Exercise Progress Chart](assets/user-stories/exercise-progress-chart.png) | Progress page showing exercise chart with Est. 1RM and weight lines |
 
 ---
 
@@ -688,7 +688,9 @@ python manage.py test --verbosity=2
 
 | Screenshot | Description |
 | :--- | :--- |
-| ![Log Workout](assets/screenshots/+log-workout.png) | New workout pre-filled from a template |
+| ![Access templates from Workouts](assets/user-stories/access-templates.png) | Access the templates page from the Workouts page |
+| ![Use/edit previously created template or create a new template](assets/user-stories/use-edit-delete-templates.png) | Edit,make use of or delete previously saved templates | 
+| ![Pre-filled Template](assets/user-stories/pre-filled-template.png) | Example of how a pre-filled template appears when used |
 
 ---
 
@@ -699,7 +701,9 @@ python manage.py test --verbosity=2
 
 | Screenshot | Description |
 | :--- | :--- |
-| ![Progress](assets/screenshots/progress.png) | Progress page showing bodyweight chart with EMA overlay |
+| ![Access the Bodyweight Tracker](assets/screenshots/progress.png) | Access the bodyweight tracker directly from the dashboard |
+| ![Bodyweight Tracker](assets/user-stories/bodyweight-tracker.png) | View, add and delete bodyweight values with dates to keep track of it |
+| ![Bodyweight Progress Chart](assets/user-stories/bodyweight-chart.png.png) | Progress page showing bodyweight chart with exponential moving average overlay |
 
 ---
 
@@ -710,7 +714,8 @@ python manage.py test --verbosity=2
 
 | Screenshot | Description |
 | :--- | :--- |
-| ![Login](assets/screenshots/login.png) | Login page with "Forgot password?" link |
+| ![Access Password Reset from the Login page](assets/user-stories/access-password-reset.png) | Login page with "Forgot password?" link |
+| ![Password Reset page](assets/user-stories/password-reset.png) | Password Reset page with form to request reset link via email |
 
 ---
 
