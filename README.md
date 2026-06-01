@@ -104,7 +104,7 @@ The site provides tangible value to these audiences across four key dimensions:
 
 - **Workout Templates**: Users can save named workout structures (e.g., "Push Day", "Leg Day") and launch a new session pre-filled with those exercises in a single click. This eliminates repetitive data entry for users following structured training programmes.
 
-- **Data Privacy & Ownership**: Unlike fitness social networks, FitTrack stores user data in a secure, password-protected account. All data is scoped to the logged-in user and is never shared or sold.
+- **Data Privacy & Ownership**: All workout data is stored in a secure, password-protected account, scoped exclusively to the logged-in user and never shared or sold.
 
 ---
 
