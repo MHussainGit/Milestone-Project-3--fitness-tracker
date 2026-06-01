@@ -39,6 +39,7 @@
     <!-- Workout Frequency chart -->
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <h2 id="freq-chart-title" class="chart-title" style="margin:0">Workout Frequency Trend</h2>
         <form method="get" style="margin:0;max-width:120px">
           <input type="hidden" name="range" value="{{ range_param }}">
           {% if selected_ex_id %}<input type="hidden" name="exercise" value="{{ selected_ex_id }}">{% endif %}
@@ -60,6 +61,7 @@
 
     <!-- Bodyweight chart -->
     <div class="card">
+      <h2 id="bw-chart-title" class="chart-title">Bodyweight Over Time</h2>
       {% if bw_data != '[]' %}
         <div class="chart-wrap">
           <canvas id="bwChart" aria-label="Bodyweight trend over time" aria-describedby="bwChart-description"></canvas>
@@ -78,6 +80,7 @@
 
   <!-- Exercise progress -->
   <div class="card" style="margin-top:1.5rem">
+    <h2 class="chart-title">Exercise Progress</h2>
     <form method="get" style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.25rem;align-items:flex-end">
       <input type="hidden" name="range" value="{{ range_param }}">
       <input type="hidden" name="freq" value="{{ freq_view }}">
