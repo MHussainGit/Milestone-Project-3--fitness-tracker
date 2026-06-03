@@ -548,7 +548,7 @@ erDiagram
     USER ||--o{ WORKOUT_TEMPLATE : "creates"
     USER ||--|| USER_PROFILE : "has"
     WORKOUT ||--o{ WORKOUT_ENTRY : "contains"
-    WORKOUT ||--o{ PERSONAL_RECORD : "achieved in"
+    WORKOUT |o--o{ PERSONAL_RECORD : "achieved in"
     EXERCISE ||--o{ WORKOUT_ENTRY : "tracked by"
     EXERCISE ||--o{ PERSONAL_RECORD : "measured by"
     EXERCISE ||--o{ WORKOUT_TEMPLATE_ITEM : "included in"
