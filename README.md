@@ -31,6 +31,9 @@ A full-stack web application designed to help gym-goers log workouts, track exer
 - [Getting Started](#getting-started)
 - [Deployment](#deployment)
 - [Data Schema](#data-schema)
+  - [Database Design](#database-design)
+  - [Entity-Relationship Diagram](#entity-relationship-diagram)
+  - [Table Descriptions](#table-descriptions)
 - [Security Features](#security-features)
 - [Accessibility](#accessibility)
 - [Validation](#validation)
@@ -461,6 +464,26 @@ See `.env.example` for full documentation of all available email options.
 
 ## Data Schema
 
+### Database Design
+
+FitTrack uses a normalised relational schema built around a central **User** entity. All user-specific data — workouts, personal records, bodyweight entries, notes, and templates — is scoped to a single user via a foreign key, ensuring complete data isolation between accounts. The **Exercise** table is deliberately shared across all users; it functions as a global reference library, avoiding duplication and ensuring consistent exercise naming across the dataset.
+
+**Entities and their roles:**
+
+| Entity | Role in the domain |
+|---|---|
+| `Exercise` | A shared reference table of named movements (e.g. "Bench Press"). Has no user FK — accessible to all accounts as a common library. |
+| `Workout` | A single training session belonging to one user, identified by name and date. Acts as the top-level container for all exercise entries in that session. |
+| `WorkoutEntry` | One exercise performed within a workout — storing sets, reps, weight (nullable for bodyweight exercises), and an auto-set PR flag. Many entries belong to one workout; each references one exercise. |
+| `PersonalRecord` | The all-time best weight and reps per user per exercise. Upserted automatically on every workout save and recalculated on entry edit or deletion. The workout FK is nullable (`SET_NULL`) so deleting a workout does not erase the PR. |
+| `WorkoutTemplate` | A saved, reusable workout structure (e.g. "Push Day") owned by one user. Used to pre-fill a new workout form in one click. |
+| `WorkoutTemplateItem` | One exercise line within a template, storing default sets, reps, and notes. Many items belong to one template; each references one exercise. |
+| `BodyWeightEntry` | A daily bodyweight measurement for one user. A unique constraint on `(user, date)` enforces one entry per day. |
+| `DailyNote` | A short journal entry with an optional mood rating, scoped to one user and one date. A unique constraint on `(user, date)` enforces one note per day. |
+| `UserProfile` | Extends the built-in Django User with application settings (weekly workout target). Created automatically on first access so no extra signup step is required. |
+
+---
+
 ### Entity-Relationship Diagram
 
 The diagram below shows all entities in the FitTrack database, their fields, and the relationships between them.
@@ -554,6 +577,8 @@ erDiagram
     EXERCISE ||--o{ WORKOUT_TEMPLATE_ITEM : "included in"
     WORKOUT_TEMPLATE ||--o{ WORKOUT_TEMPLATE_ITEM : "contains"
 ```
+
+---
 
 ### Table Descriptions
 
