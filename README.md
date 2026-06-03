@@ -463,21 +463,96 @@ See `.env.example` for full documentation of all available email options.
 
 ### Entity-Relationship Diagram
 
-```
-User (Django auth_user)
- ├─ Workout            [user FK → User, CASCADE]
- │   └─ WorkoutEntry   [workout FK → Workout, CASCADE]
- │                      [exercise FK → Exercise, CASCADE]
- ├─ PersonalRecord     [user FK → User, CASCADE]
- │                      [exercise FK → Exercise, CASCADE]
- ├─ BodyWeightEntry    [user FK → User, CASCADE]
- ├─ DailyNote          [user FK → User, CASCADE]
- ├─ WorkoutTemplate    [user FK → User, CASCADE]
- │   └─ WorkoutTemplateItem [template FK → WorkoutTemplate, CASCADE]
- │                           [exercise FK → Exercise, CASCADE]
- └─ UserProfile        [user FK → User, CASCADE]
+The diagram below shows all entities in the FitTrack database, their fields, and the relationships between them.
 
-Exercise (shared library — no user FK)
+```mermaid
+erDiagram
+    USER {
+        int id PK
+        string username
+        string email
+        string password_hash
+    }
+    EXERCISE {
+        int id PK
+        string name
+        string category
+        string muscle_group
+        string description
+    }
+    WORKOUT {
+        int id PK
+        int user_id FK
+        string name
+        date date
+        text notes
+        datetime created_at
+    }
+    WORKOUT_ENTRY {
+        int id PK
+        int workout_id FK
+        int exercise_id FK
+        int sets
+        int reps
+        decimal weight
+        string notes
+        bool is_pr
+    }
+    PERSONAL_RECORD {
+        int id PK
+        int user_id FK
+        int exercise_id FK
+        int workout_id FK
+        decimal best_weight
+        int best_reps
+        date achieved_date
+    }
+    WORKOUT_TEMPLATE {
+        int id PK
+        int user_id FK
+        string name
+        datetime created_at
+    }
+    WORKOUT_TEMPLATE_ITEM {
+        int id PK
+        int template_id FK
+        int exercise_id FK
+        int sets
+        int reps
+        string notes
+    }
+    BODY_WEIGHT_ENTRY {
+        int id PK
+        int user_id FK
+        date date
+        decimal weight
+        string notes
+    }
+    DAILY_NOTE {
+        int id PK
+        int user_id FK
+        date date
+        string mood
+        text content
+    }
+    USER_PROFILE {
+        int id PK
+        int user_id FK
+        int workout_target
+    }
+
+    USER ||--o{ WORKOUT : "logs"
+    USER ||--o{ PERSONAL_RECORD : "holds"
+    USER ||--o{ BODY_WEIGHT_ENTRY : "records"
+    USER ||--o{ DAILY_NOTE : "writes"
+    USER ||--o{ WORKOUT_TEMPLATE : "creates"
+    USER ||--|| USER_PROFILE : "has"
+    WORKOUT ||--o{ WORKOUT_ENTRY : "contains"
+    WORKOUT ||--o{ PERSONAL_RECORD : "achieved in"
+    EXERCISE ||--o{ WORKOUT_ENTRY : "tracked by"
+    EXERCISE ||--o{ PERSONAL_RECORD : "measured by"
+    EXERCISE ||--o{ WORKOUT_TEMPLATE_ITEM : "included in"
+    WORKOUT_TEMPLATE ||--o{ WORKOUT_TEMPLATE_ITEM : "contains"
 ```
 
 ### Table Descriptions
