@@ -599,7 +599,7 @@ erDiagram
 - `exercise_id` on `WorkoutEntry` uses a CASCADE constraint — deleting an exercise removes its workout entries and personal records automatically
 - `weight` is nullable on `WorkoutEntry` — this allows bodyweight exercises (pull-ups, push-ups) to be logged without a weight value
 - `PersonalRecord` is upserted (updated or created) on every workout save, so the board always reflects the user's current all-time best
-- `UserProfile` is created on first access via `get_or_create`, so no signup step is required
+- `UserProfile` is created on first access via get_or_create, so no separate profile-creation step is needed after registration.
 
 ---
 
